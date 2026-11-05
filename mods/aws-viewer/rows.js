@@ -5,9 +5,9 @@ import { isFolder, isGroupNode } from "./resources.js";
 
 const ROW_HEIGHT = 26;
 const INDENT = 16;
-const ICONS = { s3: "cloud", regions: "cloud", ssm: "cloud", iam: "cloud", "iam-users": "folder", "iam-roles": "folder", "iam-groups": "folder", "iam-policies": "folder", bucket: "bucket", prefix: "folder", "ssm-path": "folder", object: "file", parameter: "key" };
+const ICONS = { s3: "cloud", regions: "cloud", ssm: "cloud", iam: "cloud", secrets: "cloud", secret: "key", "iam-users": "folder", "iam-roles": "folder", "iam-groups": "folder", "iam-policies": "folder", bucket: "bucket", prefix: "folder", "ssm-path": "folder", object: "file", parameter: "key" };
 const EMPTY = { s3: "No buckets", bucket: "Empty bucket", prefix: "Empty folder", ssm: "No parameters", "ssm-path": "No parameters",
-  "iam-users": "No users", "iam-roles": "No roles", "iam-groups": "No groups", "iam-policies": "No local policies" };
+  "iam-users": "No users", "iam-roles": "No roles", "iam-groups": "No groups", "iam-policies": "No local policies", secrets: "No secrets" };
 
 /** `actions`: { activate(id, cx), refresh(id, cx), more(id, cx) }. */
 export function treeRow(row, selected, t, actions) {

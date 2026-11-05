@@ -49,7 +49,7 @@ test("source never reads values, writes files or logs, and runs aws in one place
   const dir = new URL("../", import.meta.url);
   const sources = readdirSync(dir).filter((f) => f.endsWith(".js")).map((f) => [f, readFileSync(new URL(f, dir), "utf8")]);
   for (const [file, text] of sources) {
-    for (const banned of ["--with-decryption", "get-parameter", "get-object", "console.log", "writeTextFile", "fs/promises", "localStorage"]) {
+    for (const banned of ["--with-decryption", "get-parameter", "get-object", "get-secret-value", "console.log", "writeTextFile", "fs/promises", "localStorage"]) {
       assert.ok(!text.includes(banned), `${file} mentions ${banned}`);
     }
   }

@@ -93,3 +93,12 @@ export function policiesPage(json) {
   }));
   return { items, nextToken: json?.NextToken ?? null };
 }
+
+/** secretsmanager list-secrets: metadata only, never the secret value. */
+export function secretsPage(json) {
+  const items = (json?.SecretList ?? []).map((s) => ({
+    id: `sm:${s.Name}`, kind: "secret", label: s.Name, name: s.Name,
+    meta: { arn: s.ARN ?? null, description: s.Description ?? null, lastChanged: s.LastChangedDate ?? null, lastAccessed: s.LastAccessedDate ?? null, created: s.CreatedDate ?? null },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}

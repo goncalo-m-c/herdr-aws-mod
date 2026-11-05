@@ -3,7 +3,7 @@
 
 export const PAGE_SIZE = 50;
 
-const READ_ONLY_COMMANDS = new Set(["s3api list-buckets", "s3api list-objects-v2", "ssm describe-parameters", "iam list-users", "iam list-roles", "iam list-groups", "iam list-policies", "configure get"]);
+const READ_ONLY_COMMANDS = new Set(["s3api list-buckets", "s3api list-objects-v2", "ssm describe-parameters", "iam list-users", "iam list-roles", "iam list-groups", "iam list-policies", "secretsmanager list-secrets", "configure get"]);
 const REGION = /^[a-z]{2}(-[a-z]+)+-\d+$/;
 // The CLI reads file:// (and similar) values from disk; a resource name must never do that.
 const URL_LIKE = /^[a-z][a-z0-9+.-]*:\/\//i;
@@ -35,6 +35,11 @@ export function listLocalPolicies(token) { return iamList("list-policies", ["--s
 
 function iamList(operation, extra, token) {
   return ["iam", operation, ...extra, `--max-items=${PAGE_SIZE}`, ...tokenArg("--starting-token", token)];
+}
+
+/** Metadata only: list-secrets never returns secret values. */
+export function listSecrets(token) {
+  return ["secretsmanager", "list-secrets", "--no-paginate", `--max-results=${PAGE_SIZE}`, ...tokenArg("--next-token", token)];
 }
 
 /** The `regions` prop as a list of valid region names; throws Refusal on a bad one. Missing means []. */

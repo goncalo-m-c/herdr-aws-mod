@@ -27,6 +27,10 @@ export function detailFields(node) {
     ["Created", formatDate(m.created)], ["Updated", formatDate(m.updated)], ["Attached to", m.attachmentCount ?? "—"],
     ["Default version", m.defaultVersion ?? "—"],
   ];
+  if (node?.kind === "secret") return [
+    ["Name", node.name], ["ARN", m.arn ?? "—"], ["Description", m.description || "—"], ["Last changed", formatDate(m.lastChanged)],
+    ["Last accessed", formatDate(m.lastAccessed)], ["Created", formatDate(m.created)],
+  ];
   return [];
 }
 

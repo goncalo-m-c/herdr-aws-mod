@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage } from "../parse.js";
+import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage } from "../parse.js";
 
 const fixture = (name) => JSON.parse(readFileSync(new URL(`./fixtures/${name}.json`, import.meta.url), "utf8"));
 
@@ -57,4 +57,13 @@ test("IAM roles, groups and local policies pages", () => {
   const policy = policiesPage(fixture("iam-list-policies")).items[0];
   assert.deepEqual([policy.kind, policy.label, policy.meta.attachmentCount, policy.meta.defaultVersion], ["iam-policy", "read-reports", 3, "v2"]);
   assert.deepEqual(usersPage({}).items, []);
+});
+
+test("secrets page: metadata only, no value fields", () => {
+  const page = secretsPage(fixture("list-secrets"));
+  assert.deepEqual(page.items.map((i) => [i.kind, i.label]), [["secret", "app/db"], ["secret", "plain"]]);
+  assert.deepEqual(Object.keys(page.items[0].meta), ["arn", "description", "lastChanged", "lastAccessed", "created"]);
+  assert.equal(page.items[0].meta.description, "Example database login");
+  assert.equal(page.nextToken, "example-secrets-token");
+  assert.equal(secretsPage({}).nextToken, null);
 });

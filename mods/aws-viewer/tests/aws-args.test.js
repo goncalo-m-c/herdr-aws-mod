@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
+import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
 
 const DEV = { profile: "dev", region: "eu-west-1" };
 
@@ -81,4 +81,19 @@ test("IAM write and other read calls are refused", () => {
     ["iam", "create-user", "--user-name=x"], ["iam", "delete-role", "--role-name=x"], ["iam", "attach-user-policy"],
     ["iam", "create-access-key"], ["iam", "get-user"], ["iam", "list-access-keys"], ["iam", "get-policy-version"],
   ]) assert.throws(() => invocation(command, DEV), Refusal, command.join(" "));
+});
+
+test("list-secrets is allowed, one page, and secret values are refused", () => {
+  assert.deepEqual(invocation(listSecrets(null), { profile: "dev", region: "eu-west-1" }), [
+    "secretsmanager", "list-secrets", "--no-paginate", `--max-results=${PAGE_SIZE}`,
+    "--profile=dev", "--region=eu-west-1", "--output=json", "--no-cli-pager", "--no-cli-auto-prompt",
+  ]);
+  assert.ok(listSecrets("t").includes("--next-token=t"));
+  for (const command of [
+    ["secretsmanager", "get-secret-value", "--secret-id=x"], ["secretsmanager", "batch-get-secret-value"], ["secretsmanager", "describe-secret", "--secret-id=x"],
+    ["secretsmanager", "create-secret"], ["secretsmanager", "put-secret-value"], ["secretsmanager", "delete-secret"],
+  ]) {
+    assert.equal(isReadOnly(command), false, command.join(" "));
+    assert.throws(() => invocation(command, DEV), Refusal, command.join(" "));
+  }
 });
