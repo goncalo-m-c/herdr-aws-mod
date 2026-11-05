@@ -8,6 +8,8 @@ A read-only browser for your AWS account, in a Herdr tab. A header shows the pro
 
 The mod is one pane, 900 by 600 at first, in the theme's background and foreground colors. Text is 13px.
 
+`preview.png` shows the final build: the header with the profile, the region and the `read-only` label, the tree with S3 and EC2 expanded (EC2 is grouped per region), and the details pane for one EC2 instance.
+
 - **Header, 42px high**, with a bottom border. Left to right:
   - A neutral cloud icon (`cloud.svg`, 20px, muted color).
   - `profile <name>` in 12px, `ansi2` green. Before the profile is read it shows `Reading AWS_PROFILE…` in the dim color. With no profile it shows `profile (none)`. The tooltip says whether the profile came from props or from `AWS_PROFILE` (login shell).
@@ -126,7 +128,6 @@ Response fields read, per command: `Buckets[].Name/CreationDate/BucketRegion` an
 ## Watch out
 
 - **Not verified live.** The AWS response shapes above came from the AWS CLI documentation, not from live calls. The UI was not run in Herdr in the build agent's environment. Only the pure modules are tested, with fake fixtures. A fresh build must run it once against a real account.
-- **`preview.png` shows the earlier view** (S3 and SSM only). It should be retaken.
 - The viewer blocks any argument that contains `decryption`, and any resource name that looks like a URL such as `file://`.
 - The environment lookup uses a login shell (`$SHELL -lc`). `zsh -l` does not read `.zshrc`. Set `AWS_PROFILE` in `.zshenv` or `.zprofile`, or pass `profile` as a prop.
 - Do not add `--no-paginate` to calls that use `--max-items`. The CLI rejects the pair. For S3, `--max-items` counts only `Contents`, so on a prefix-only level it could walk every page. That is why S3 uses `--no-paginate` with the native size and token.
