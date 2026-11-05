@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, Refusal, PAGE_SIZE } from "../aws-args.js";
+import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
 
 const DEV = { profile: "dev", region: "eu-west-1" };
 
@@ -57,4 +57,11 @@ test("only read-only commands, never decryption", () => {
 test("region must look like a region; empty region is left to the profile", () => {
   assert.throws(() => invocation(listBuckets(null), { profile: "dev", region: "--endpoint-url=http://x" }), Refusal);
   assert.ok(!invocation(listBuckets(null), { profile: "dev", region: "" }).some((a) => a.startsWith("--region")));
+});
+
+test("regions prop: valid names pass, missing means none, a bad name is refused", () => {
+  assert.deepEqual(regionList(["us-east-1", "eu-west-1"]), ["us-east-1", "eu-west-1"]);
+  assert.deepEqual(regionList(undefined), []);
+  assert.throws(() => regionList(["us-east-1", "nope; rm"]), Refusal);
+  assert.throws(() => regionList("us-east-1"), Refusal);
 });

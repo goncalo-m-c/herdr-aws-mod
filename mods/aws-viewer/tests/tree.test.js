@@ -70,3 +70,24 @@ test("leaves do not toggle", () => {
   finishLoad(tree, "s3", startLoad(tree, "s3"), { items: [object("x")], nextToken: null });
   assert.equal(toggle(tree, "s3o:b/x"), false);
 });
+
+test("regions give SSM one group per region and S3 once", () => {
+  const tree = createTree(SERVICES, ["us-east-1", "eu-west-1"]);
+  toggle(tree, "ssm");
+  assert.deepEqual(types(tree), ["node:S3", "node:SSM Parameter Store", "node:us-east-1", "node:eu-west-1"]);
+  assert.equal(toggle(tree, "ssm@eu-west-1"), true);
+  assert.equal(tree.nodes.get("ssm@eu-west-1").region, "eu-west-1");
+});
+
+test("a region group loads its own children, tagged with the region", () => {
+  const tree = createTree(SERVICES, ["us-east-1", "eu-west-1"]);
+  const param = { id: "ssmp:/a", kind: "parameter", label: "a", name: "/a" };
+  for (const id of ["ssm@us-east-1", "ssm@eu-west-1"]) { toggle(tree, "ssm"); toggle(tree, id); finishLoad(tree, id, startLoad(tree, id), { items: [param], nextToken: null }); }
+  assert.equal(tree.nodes.get("ssmp:/a@us-east-1").region, "us-east-1");
+  assert.equal(tree.nodes.get("ssmp:/a@eu-west-1").region, "eu-west-1");
+});
+
+test("without regions the tree is unchanged", () => {
+  assert.deepEqual(types(createTree(SERVICES, [])), ["node:S3", "node:SSM Parameter Store"]);
+  assert.equal(createTree(SERVICES).nodes.get("ssm").kind, "ssm");
+});
