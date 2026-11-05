@@ -5,9 +5,9 @@ import { isFolder, isGroupNode } from "./resources.js";
 
 const ROW_HEIGHT = 26;
 const INDENT = 16;
-const ICONS = { s3: "cloud", regions: "cloud", ssm: "cloud", iam: "cloud", lambda: "cloud", ecr: "cloud", "ecr-repo": "folder", "ecr-image": "file", ec2: "cloud", "ec2-instance": "file", efs: "cloud", "efs-filesystem": "file", "lambda-function": "file", secrets: "cloud", secret: "key", "iam-users": "folder", "iam-roles": "folder", "iam-groups": "folder", "iam-policies": "folder", bucket: "bucket", prefix: "folder", "ssm-path": "folder", object: "file", parameter: "key" };
+const ICONS = { s3: "cloud", regions: "cloud", ssm: "cloud", iam: "cloud", lambda: "cloud", ecr: "cloud", "ecr-repo": "folder", "ecr-image": "file", ec2: "cloud", "ec2-instance": "file", efs: "cloud", "efs-filesystem": "file", eks: "cloud", "eks-cluster": "folder", "eks-details": "file", "lambda-function": "file", secrets: "cloud", secret: "key", "iam-users": "folder", "iam-roles": "folder", "iam-groups": "folder", "iam-policies": "folder", bucket: "bucket", prefix: "folder", "ssm-path": "folder", object: "file", parameter: "key" };
 const EMPTY = { s3: "No buckets", bucket: "Empty bucket", prefix: "Empty folder", ssm: "No parameters", "ssm-path": "No parameters",
-  "iam-users": "No users", "iam-roles": "No roles", "iam-groups": "No groups", "iam-policies": "No local policies", secrets: "No secrets", lambda: "No functions", ecr: "No repositories", ec2: "No instances", efs: "No file systems", "ecr-repo": "No images" };
+  "iam-users": "No users", "iam-roles": "No roles", "iam-groups": "No groups", "iam-policies": "No local policies", secrets: "No secrets", lambda: "No functions", ecr: "No repositories", ec2: "No instances", efs: "No file systems", eks: "No clusters", "eks-cluster": "No details", "ecr-repo": "No images" };
 
 /** `actions`: { activate(id, cx), refresh(id, cx), more(id, cx) }. */
 export function treeRow(row, selected, t, actions) {

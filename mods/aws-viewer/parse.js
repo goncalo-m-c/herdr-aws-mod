@@ -146,6 +146,25 @@ export function fileSystemsPage(json) {
   return { items, nextToken: json?.NextToken ?? null };
 }
 
+/** eks list-clusters: names only; each cluster is a folder that opens to its details. */
+export function clustersPage(json) {
+  const items = (json?.clusters ?? []).map((name) => ({ id: `eks:${name}`, kind: "eks-cluster", label: name, cluster: name }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
+/** eks describe-cluster: one details leaf. Version, status, endpoint and created date only; no certificate data. */
+export function clusterDetailsPage(json, cluster) {
+  const c = json?.cluster;
+  if (!c) return { items: [], nextToken: null };
+  return {
+    items: [{
+      id: `eksd:${cluster}`, kind: "eks-details", label: [c.version && `v${c.version}`, c.status].filter(Boolean).join(" ") || "Details", name: c.name ?? cluster, cluster,
+      meta: { version: c.version ?? null, status: c.status ?? null, endpoint: c.endpoint ?? null, created: c.createdAt ?? null },
+    }],
+    nextToken: null,
+  };
+}
+
 /** secretsmanager list-secrets: metadata only, never the secret value. */
 export function secretsPage(json) {
   const items = (json?.SecretList ?? []).map((s) => ({

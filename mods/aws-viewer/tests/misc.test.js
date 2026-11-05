@@ -77,3 +77,8 @@ test("EFS details show id, name, size, performance mode and state", () => {
   const fields = detailFields({ kind: "efs-filesystem", name: "shared-data", meta: { id: "fs-0123EXAMPLE1", size: 6144, performanceMode: "generalPurpose", state: "available" } });
   assert.deepEqual(fields, [["File system ID", "fs-0123EXAMPLE1"], ["Name", "shared-data"], ["Size", "6 KB (6,144 bytes)"], ["Performance mode", "generalPurpose"], ["State", "available"]]);
 });
+
+test("EKS details show version, status, endpoint and created date", () => {
+  const fields = detailFields({ kind: "eks-details", name: "prod-cluster", meta: { version: "1.30", status: "ACTIVE", endpoint: "https://EXAMPLE.eks.amazonaws.com", created: "2024-05-01T08:30:00.000000+00:00" } });
+  assert.deepEqual(fields, [["Cluster", "prod-cluster"], ["Version", "1.30"], ["Status", "ACTIVE"], ["Endpoint", "https://EXAMPLE.eks.amazonaws.com"], ["Created", "2024-05-01 08:30 UTC"]]);
+});

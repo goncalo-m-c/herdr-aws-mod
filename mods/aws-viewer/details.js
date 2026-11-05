@@ -11,6 +11,7 @@ const NOTES = {
   "ecr-image": "Metadata from ecr describe-images. Image contents are never pulled.",
   "ec2-instance": "Metadata from ec2 describe-instances. User data, other tags and console output are never read.",
   "efs-filesystem": "Metadata from efs describe-file-systems. File contents are never read.",
+  "eks-details": "Metadata from eks describe-cluster. Certificate data and credentials are never read.",
   "iam-user": "Metadata from iam list-users.",
   "iam-role": "Metadata from iam list-roles.",
   "iam-group": "Metadata from iam list-groups.",

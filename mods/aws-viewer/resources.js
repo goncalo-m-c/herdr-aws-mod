@@ -1,7 +1,7 @@
 // Which aws call loads a folder node's next page, and which parser reads it.
 // Pure, so node --test covers it.
-import { listBuckets, listObjects, describeParameters, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, describeFileSystems } from "./aws-args.js";
-import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage, fileSystemsPage } from "./parse.js";
+import { listBuckets, listObjects, describeParameters, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, describeFileSystems, listClusters, describeCluster } from "./aws-args.js";
+import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage, fileSystemsPage, clustersPage, clusterDetailsPage } from "./parse.js";
 
 // `regional: true` services get one group per listed region; the rest (global, like S3) show once.
 export const SERVICES = [
@@ -16,6 +16,7 @@ export const SERVICES = [
   { id: "ecr", kind: "ecr", label: "ECR", regional: true },
   { id: "ec2", kind: "ec2", label: "EC2", regional: true },
   { id: "efs", kind: "efs", label: "EFS", regional: true },
+  { id: "eks", kind: "eks", label: "EKS", regional: true },
   { id: "ssm", kind: "ssm", label: "SSM Parameter Store", path: "", regional: true },
 ];
 
@@ -33,6 +34,8 @@ const LOADERS = {
   "ecr-repo": { command: (node, token) => describeImages(node.repository, token), parse: (node, json) => imagesPage(json, node.repository) },
   ec2: { command: (_node, token) => describeInstances(token), parse: (_node, json) => instancesPage(json) },
   efs: { command: (_node, token) => describeFileSystems(token), parse: (_node, json) => fileSystemsPage(json) },
+  eks: { command: (_node, token) => listClusters(token), parse: (_node, json) => clustersPage(json) },
+  "eks-cluster": { command: (node) => describeCluster(node.cluster), parse: (node, json) => clusterDetailsPage(json, node.cluster) },
   ssm: { command: (node, token) => describeParameters(node.path, token), parse: (node, json) => parametersPage(json, node.path) },
   "ssm-path": { command: (node, token) => describeParameters(node.path, token), parse: (node, json) => parametersPage(json, node.path) },
 };

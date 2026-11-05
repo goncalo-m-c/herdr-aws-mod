@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage, fileSystemsPage } from "../parse.js";
+import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage, fileSystemsPage, clustersPage, clusterDetailsPage } from "../parse.js";
 
 const fixture = (name) => JSON.parse(readFileSync(new URL(`./fixtures/${name}.json`, import.meta.url), "utf8"));
 
@@ -108,4 +108,21 @@ test("EFS file systems page: id, name, size, performance mode, state, token", ()
   assert.deepEqual(page.items[0].meta, { id: "fs-0123EXAMPLE1", size: 6144, performanceMode: "generalPurpose", state: "available" });
   assert.equal(page.nextToken, "example-filesystems-token");
   assert.deepEqual(fileSystemsPage({}).items, []);
+});
+
+test("EKS clusters page: names become folders, with a token", () => {
+  const page = clustersPage(fixture("eks-list-clusters"));
+  assert.deepEqual(page.items.map((i) => [i.kind, i.label, i.cluster]), [["eks-cluster", "prod-cluster", "prod-cluster"], ["eks-cluster", "dev-cluster", "dev-cluster"]]);
+  assert.equal(page.nextToken, "example-clusters-token");
+  assert.deepEqual(clustersPage({}).items, []);
+});
+
+test("EKS cluster details page: one leaf with version, status, endpoint, created; no certificate", () => {
+  const page = clusterDetailsPage(fixture("eks-describe-cluster"), "prod-cluster");
+  assert.equal(page.items.length, 1);
+  assert.deepEqual([page.items[0].kind, page.items[0].label], ["eks-details", "v1.30 ACTIVE"]);
+  assert.deepEqual(page.items[0].meta, { version: "1.30", status: "ACTIVE", endpoint: "https://EXAMPLE0123456789.gr7.eu-west-1.eks.amazonaws.com", created: "2024-05-01T08:30:00.000000+00:00" });
+  assert.ok(!JSON.stringify(page).includes("EXAMPLE-NOT-SHOWN"));
+  assert.equal(page.nextToken, null);
+  assert.deepEqual(clusterDetailsPage({}, "x").items, []);
 });

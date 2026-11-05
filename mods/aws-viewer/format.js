@@ -1,6 +1,6 @@
 // How the details pane shows a leaf's metadata. Pure, so node --test covers it.
 
-/** [[label, value]] for an S3 object, SSM parameter, IAM resource, secret, Lambda function, ECR image, EC2 instance or EFS file system; never a value or object content. */
+/** [[label, value]] for an S3 object, SSM parameter, IAM resource, secret, Lambda function, ECR image, EC2 instance, EFS file system or EKS cluster; never a value or object content. */
 export function detailFields(node) {
   const m = node?.meta ?? {};
   if (node?.kind === "object") return [
@@ -46,6 +46,9 @@ export function detailFields(node) {
   if (node?.kind === "efs-filesystem") return [
     ["File system ID", m.id ?? "—"], ["Name", node.name === m.id ? "—" : node.name], ["Size", sizeWithBytes(m.size)],
     ["Performance mode", m.performanceMode ?? "—"], ["State", m.state ?? "—"],
+  ];
+  if (node?.kind === "eks-details") return [
+    ["Cluster", node.name], ["Version", m.version ?? "—"], ["Status", m.status ?? "—"], ["Endpoint", m.endpoint ?? "—"], ["Created", formatDate(m.created)],
   ];
   return [];
 }

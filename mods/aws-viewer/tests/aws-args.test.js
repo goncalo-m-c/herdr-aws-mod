@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, describeFileSystems, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
+import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, describeFileSystems, listClusters, describeCluster, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
 
 const DEV = { profile: "dev", region: "eu-west-1" };
 
@@ -152,6 +152,21 @@ test("EFS describe-file-systems is allowed, CLI-paged, and writes are refused", 
   assert.ok(describeFileSystems("t").includes("--starting-token=t"));
   assert.ok(!describeFileSystems("t").includes("--no-paginate"));
   for (const command of [["efs", "create-file-system"], ["efs", "delete-file-system", "--file-system-id=x"], ["efs", "describe-file-system-policy"], ["efs", "describe-mount-targets"]]) {
+    assert.equal(isReadOnly(command), false, command.join(" "));
+    assert.throws(() => invocation(command, DEV), Refusal, command.join(" "));
+  }
+});
+
+test("EKS list-clusters and describe-cluster are allowed, and writes are refused", () => {
+  assert.deepEqual(invocation(listClusters(null), DEV), [
+    "eks", "list-clusters", `--max-items=${PAGE_SIZE}`, "--profile=dev", "--region=eu-west-1", "--output=json", "--no-cli-pager", "--no-cli-auto-prompt",
+  ]);
+  assert.ok(listClusters("t").includes("--starting-token=t"));
+  assert.ok(!listClusters("t").includes("--no-paginate"));
+  assert.deepEqual(describeCluster("prod-cluster"), ["eks", "describe-cluster", "--name=prod-cluster"]);
+  assert.ok(isReadOnly(describeCluster("prod-cluster")));
+  assert.throws(() => describeCluster("file://etc/passwd"), Refusal);
+  for (const command of [["eks", "create-cluster", "--name=x"], ["eks", "delete-cluster", "--name=x"], ["eks", "update-cluster-config"], ["eks", "get-token", "--cluster-name=x"], ["eks", "update-kubeconfig"]]) {
     assert.equal(isReadOnly(command), false, command.join(" "));
     assert.throws(() => invocation(command, DEV), Refusal, command.join(" "));
   }

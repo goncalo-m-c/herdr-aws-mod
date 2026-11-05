@@ -1,0 +1,4 @@
+{
+  "clusters": ["prod-cluster", "dev-cluster"],
+  "NextToken": "example-clusters-token"
+}
