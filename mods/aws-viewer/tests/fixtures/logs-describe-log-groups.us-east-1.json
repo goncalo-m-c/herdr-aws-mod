@@ -1,0 +1,29 @@
+{
+    "logGroups": [
+        {
+            "logGroupName": "/aws/lambda/report-builder",
+            "creationTime": 1793912100983,
+            "retentionInDays": 14,
+            "metricFilterCount": 0,
+            "arn": "arn:aws:logs:us-east-1:123456789012:log-group:/aws/lambda/report-builder:*",
+            "storedBytes": 0,
+            "logGroupArn": "arn:aws:logs:us-east-1:123456789012:log-group:/aws/lambda/report-builder"
+        },
+        {
+            "logGroupName": "/example/app",
+            "creationTime": 1793912101517,
+            "metricFilterCount": 0,
+            "arn": "arn:aws:logs:us-east-1:123456789012:log-group:/example/app:*",
+            "storedBytes": 0,
+            "logGroupArn": "arn:aws:logs:us-east-1:123456789012:log-group:/example/app"
+        },
+        {
+            "logGroupName": "/example/worker",
+            "creationTime": 1793912102029,
+            "metricFilterCount": 0,
+            "arn": "arn:aws:logs:us-east-1:123456789012:log-group:/example/worker:*",
+            "storedBytes": 0,
+            "logGroupArn": "arn:aws:logs:us-east-1:123456789012:log-group:/example/worker"
+        }
+    ]
+}

@@ -1,0 +1,7 @@
+{
+    "clusters": [
+        "dev-cluster",
+        "prod-cluster"
+    ],
+    "NextToken": "eyJuZXh0VG9rZW4iOiBudWxsLCAiYm90b190cnVuY2F0ZV9hbW91bnQiOiAyfQ=="
+}

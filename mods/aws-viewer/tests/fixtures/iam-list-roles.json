@@ -1,6 +1,107 @@
 {
     "Roles": [
-        { "Path": "/", "RoleName": "app-role", "RoleId": "AROAEXAMPLEROLEID001", "Arn": "arn:aws:iam::123456789012:role/app-role", "CreateDate": "2024-03-01T09:00:00+00:00", "AssumeRolePolicyDocument": {}, "Description": "Example app role", "MaxSessionDuration": 3600 },
-        { "Path": "/", "RoleName": "plain-role", "RoleId": "AROAEXAMPLEROLEID002", "Arn": "arn:aws:iam::123456789012:role/plain-role", "CreateDate": "2024-03-02T09:00:00+00:00", "MaxSessionDuration": 43200 }
+        {
+            "Path": "/",
+            "RoleName": "web-role",
+            "RoleId": "AROARZPUZDIKAQODLRX7U",
+            "Arn": "arn:aws:iam::123456789012:role/web-role",
+            "CreateDate": "2026-11-05T20:54:32.890078+00:00",
+            "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                        },
+                        "Action": "sts:AssumeRole"
+                    }
+                ]
+            },
+            "Description": "Sample role web-role",
+            "MaxSessionDuration": 3600
+        },
+        {
+            "Path": "/",
+            "RoleName": "batch-role",
+            "RoleId": "AROARZPUZDIKHXHXPUB32",
+            "Arn": "arn:aws:iam::123456789012:role/batch-role",
+            "CreateDate": "2026-11-05T20:54:32.364128+00:00",
+            "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                        },
+                        "Action": "sts:AssumeRole"
+                    }
+                ]
+            },
+            "Description": "Sample role batch-role",
+            "MaxSessionDuration": 3600
+        },
+        {
+            "Path": "/",
+            "RoleName": "lambda-exec-us-east-1",
+            "RoleId": "AROARZPUZDIKILNTVMEMD",
+            "Arn": "arn:aws:iam::123456789012:role/lambda-exec-us-east-1",
+            "CreateDate": "2026-11-05T20:54:46.159330+00:00",
+            "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                        },
+                        "Action": "sts:AssumeRole"
+                    }
+                ]
+            },
+            "MaxSessionDuration": 3600
+        },
+        {
+            "Path": "/",
+            "RoleName": "app-role",
+            "RoleId": "AROARZPUZDIKJ3WPVS7FG",
+            "Arn": "arn:aws:iam::123456789012:role/app-role",
+            "CreateDate": "2026-11-05T20:54:31.840837+00:00",
+            "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                        },
+                        "Action": "sts:AssumeRole"
+                    }
+                ]
+            },
+            "Description": "Sample role app-role",
+            "MaxSessionDuration": 3600
+        },
+        {
+            "Path": "/",
+            "RoleName": "lambda-exec-eu-west-1",
+            "RoleId": "AROARZPUZDIKNGMVMUJM7",
+            "Arn": "arn:aws:iam::123456789012:role/lambda-exec-eu-west-1",
+            "CreateDate": "2026-11-05T20:55:07.964612+00:00",
+            "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                        },
+                        "Action": "sts:AssumeRole"
+                    }
+                ]
+            },
+            "MaxSessionDuration": 3600
+        }
     ]
 }

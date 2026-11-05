@@ -1,0 +1,15 @@
+{
+    "imageDetails": [
+        {
+            "registryId": "123456789012",
+            "repositoryName": "team/web",
+            "imageDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "imageTags": [
+                "v1.0.0"
+            ],
+            "imageSizeInBytes": 10,
+            "imagePushedAt": "2026-11-05T20:55:11+00:00",
+            "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json"
+        }
+    ]
+}

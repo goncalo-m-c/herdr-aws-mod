@@ -1,0 +1,26 @@
+{
+    "IsTruncated": false,
+    "Contents": [
+        {
+            "Key": "readme.txt",
+            "LastModified": "2026-11-05T20:54:37+00:00",
+            "ETag": "\"128507e329792a7afcf62fbb4c2c2296\"",
+            "ChecksumAlgorithm": [
+                "CRC64NVME"
+            ],
+            "Size": 14,
+            "StorageClass": "STANDARD"
+        }
+    ],
+    "Name": "reports-bucket",
+    "Prefix": "",
+    "Delimiter": "/",
+    "MaxKeys": 50,
+    "CommonPrefixes": [
+        {
+            "Prefix": "reports/"
+        }
+    ],
+    "EncodingType": "url",
+    "KeyCount": 2
+}

@@ -1,7 +1,25 @@
 {
     "Users": [
-        { "Path": "/", "UserName": "alice", "UserId": "AIDAEXAMPLEUSERID001", "Arn": "arn:aws:iam::123456789012:user/alice", "CreateDate": "2024-01-15T10:00:00+00:00", "PasswordLastUsed": "2024-05-01T08:30:00+00:00" },
-        { "Path": "/ci/", "UserName": "bot", "UserId": "AIDAEXAMPLEUSERID002", "Arn": "arn:aws:iam::123456789012:user/ci/bot", "CreateDate": "2024-02-20T12:00:00+00:00" }
-    ],
-    "NextToken": "example-users-token"
+        {
+            "Path": "/",
+            "UserName": "alice",
+            "UserId": "t1g7ylnfv4kosiaan9rn",
+            "Arn": "arn:aws:iam::123456789012:user/alice",
+            "CreateDate": "2026-11-05T20:54:30.247037+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "bob",
+            "UserId": "9faphb7exdt0hfzgoajj",
+            "Arn": "arn:aws:iam::123456789012:user/bob",
+            "CreateDate": "2026-11-05T20:54:30.799500+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "carol",
+            "UserId": "b2ufikw1id4erryjcyos",
+            "Arn": "arn:aws:iam::123456789012:user/carol",
+            "CreateDate": "2026-11-05T20:54:31.307502+00:00"
+        }
+    ]
 }

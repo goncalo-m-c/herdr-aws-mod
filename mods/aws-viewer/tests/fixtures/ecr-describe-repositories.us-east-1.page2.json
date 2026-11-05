@@ -1,0 +1,18 @@
+{
+    "repositories": [
+        {
+            "repositoryArn": "arn:aws:ecr:us-east-1:123456789012:repository/worker",
+            "registryId": "123456789012",
+            "repositoryName": "worker",
+            "repositoryUri": "123456789012.dkr.ecr.us-east-1.amazonaws.com/worker",
+            "createdAt": "2026-11-05T20:54:49.495000+00:00",
+            "imageTagMutability": "MUTABLE",
+            "imageScanningConfiguration": {
+                "scanOnPush": false
+            },
+            "encryptionConfiguration": {
+                "encryptionType": "AES256"
+            }
+        }
+    ]
+}

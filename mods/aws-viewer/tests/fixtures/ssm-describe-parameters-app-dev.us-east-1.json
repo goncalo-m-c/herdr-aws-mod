@@ -1,0 +1,32 @@
+{
+    "Parameters": [
+        {
+            "Name": "/app/dev/feature-flag",
+            "Type": "String",
+            "LastModifiedDate": "2026-11-05T20:54:42.780000+00:00",
+            "LastModifiedUser": "N/A",
+            "Version": 1,
+            "Tier": "Standard",
+            "DataType": "text"
+        },
+        {
+            "Name": "/app/dev/db/host",
+            "Type": "String",
+            "LastModifiedDate": "2026-11-05T20:54:43.407000+00:00",
+            "LastModifiedUser": "N/A",
+            "Version": 1,
+            "Tier": "Standard",
+            "DataType": "text"
+        },
+        {
+            "Name": "/app/dev/db/password",
+            "Type": "SecureString",
+            "KeyId": "alias/aws/ssm",
+            "LastModifiedDate": "2026-11-05T20:54:43.985000+00:00",
+            "LastModifiedUser": "N/A",
+            "Version": 1,
+            "Tier": "Standard",
+            "DataType": "text"
+        }
+    ]
+}

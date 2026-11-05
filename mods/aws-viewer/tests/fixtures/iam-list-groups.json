@@ -1,5 +1,25 @@
 {
     "Groups": [
-        { "Path": "/", "GroupName": "admins", "GroupId": "AGPAEXAMPLEGROUPID01", "Arn": "arn:aws:iam::123456789012:group/admins", "CreateDate": "2024-01-10T10:00:00+00:00" }
+        {
+            "Path": "/",
+            "GroupName": "admins",
+            "GroupId": "38gdwgw0od2idnfwzrib",
+            "Arn": "arn:aws:iam::123456789012:group/admins",
+            "CreateDate": "2026-11-05T20:54:33.399129+00:00"
+        },
+        {
+            "Path": "/",
+            "GroupName": "readers",
+            "GroupId": "30v0g7j5hei35wdwed6y",
+            "Arn": "arn:aws:iam::123456789012:group/readers",
+            "CreateDate": "2026-11-05T20:54:33.949415+00:00"
+        },
+        {
+            "Path": "/",
+            "GroupName": "developers",
+            "GroupId": "ex3kwaj1wdeu5kw4zb1r",
+            "Arn": "arn:aws:iam::123456789012:group/developers",
+            "CreateDate": "2026-11-05T20:54:34.467312+00:00"
+        }
     ]
 }
