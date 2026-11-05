@@ -1,4 +1,4 @@
-// AWS viewer (prototype): S3 and SSM Parameter Store as a lazy, paged, read-only tree.
+// Herdr Browser for AWS: S3 and SSM Parameter Store as a lazy, paged, read-only tree.
 // Every aws call is built in aws-args.js; SSM shows metadata, never values.
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
