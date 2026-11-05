@@ -1,6 +1,6 @@
 // How the details pane shows a leaf's metadata. Pure, so node --test covers it.
 
-/** [[label, value]] for an S3 object, SSM parameter, IAM resource or secret; never a value or object content. */
+/** [[label, value]] for an S3 object, SSM parameter, IAM resource, secret, Lambda function or ECR repository or image; never a value or object content. */
 export function detailFields(node) {
   const m = node?.meta ?? {};
   if (node?.kind === "object") return [
@@ -30,6 +30,10 @@ export function detailFields(node) {
   if (node?.kind === "secret") return [
     ["Name", node.name], ["ARN", m.arn ?? "—"], ["Description", m.description || "—"], ["Last changed", formatDate(m.lastChanged)],
     ["Last accessed", formatDate(m.lastAccessed)], ["Created", formatDate(m.created)],
+  ];
+  if (node?.kind === "lambda-function") return [
+    ["Name", node.name], ["Runtime", m.runtime ?? "—"], ["Memory", m.memory != null ? `${m.memory} MB` : "—"], ["Last modified", formatDate(m.lastModified)],
+    ["ARN", m.arn ?? "—"],
   ];
   return [];
 }

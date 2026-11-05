@@ -56,3 +56,8 @@ test("source never reads values, writes files or logs, and runs aws in one place
   const runsAws = sources.filter(([, text]) => /exec\(\s*"aws"/.test(text)).map(([f]) => f);
   assert.deepEqual(runsAws, ["aws.js"]);
 });
+
+test("Lambda details show name, runtime, memory and last modified", () => {
+  const fields = detailFields({ kind: "lambda-function", name: "report-builder", meta: { runtime: "python3.12", memory: 256, lastModified: "2024-05-01T08:30:00.000+0000" } });
+  assert.deepEqual(fields.slice(0, 4), [["Name", "report-builder"], ["Runtime", "python3.12"], ["Memory", "256 MB"], ["Last modified", "2024-05-01 08:30 UTC"]]);
+});

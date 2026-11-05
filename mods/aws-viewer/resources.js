@@ -1,7 +1,7 @@
 // Which aws call loads a folder node's next page, and which parser reads it.
 // Pure, so node --test covers it.
-import { listBuckets, listObjects, describeParameters, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets } from "./aws-args.js";
-import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage } from "./parse.js";
+import { listBuckets, listObjects, describeParameters, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions } from "./aws-args.js";
+import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage } from "./parse.js";
 
 // `regional: true` services get one group per listed region; the rest (global, like S3) show once.
 export const SERVICES = [
@@ -12,6 +12,7 @@ export const SERVICES = [
     { kind: "iam-groups", label: "Groups" }, { kind: "iam-policies", label: "Policies (local)" },
   ] },
   { id: "secrets", kind: "secrets", label: "Secrets Manager", regional: true },
+  { id: "lambda", kind: "lambda", label: "Lambda", regional: true },
   { id: "ssm", kind: "ssm", label: "SSM Parameter Store", path: "", regional: true },
 ];
 
@@ -24,6 +25,7 @@ const LOADERS = {
   "iam-groups": { command: (_node, token) => listGroups(token), parse: (_node, json) => groupsPage(json) },
   "iam-policies": { command: (_node, token) => listLocalPolicies(token), parse: (_node, json) => policiesPage(json) },
   secrets: { command: (_node, token) => listSecrets(token), parse: (_node, json) => secretsPage(json) },
+  lambda: { command: (_node, token) => listFunctions(token), parse: (_node, json) => functionsPage(json) },
   ssm: { command: (node, token) => describeParameters(node.path, token), parse: (node, json) => parametersPage(json, node.path) },
   "ssm-path": { command: (node, token) => describeParameters(node.path, token), parse: (node, json) => parametersPage(json, node.path) },
 };

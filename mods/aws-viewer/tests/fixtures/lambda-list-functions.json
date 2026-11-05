@@ -1,0 +1,7 @@
+{
+    "Functions": [
+        { "FunctionName": "report-builder", "FunctionArn": "arn:aws:lambda:eu-west-1:123456789012:function:report-builder", "Runtime": "python3.12", "Role": "arn:aws:iam::123456789012:role/app-role", "Handler": "app.handler", "CodeSize": 2048, "MemorySize": 256, "LastModified": "2024-05-01T08:30:00.000+0000", "PackageType": "Zip" },
+        { "FunctionName": "image-fn", "FunctionArn": "arn:aws:lambda:eu-west-1:123456789012:function:image-fn", "MemorySize": 1024, "LastModified": "2024-06-02T10:00:00.000+0000", "PackageType": "Image" }
+    ],
+    "NextToken": "example-functions-token"
+}

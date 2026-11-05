@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
+import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
 
 const DEV = { profile: "dev", region: "eu-west-1" };
 
@@ -92,6 +92,21 @@ test("list-secrets is allowed, one page, and secret values are refused", () => {
   for (const command of [
     ["secretsmanager", "get-secret-value", "--secret-id=x"], ["secretsmanager", "batch-get-secret-value"], ["secretsmanager", "describe-secret", "--secret-id=x"],
     ["secretsmanager", "create-secret"], ["secretsmanager", "put-secret-value"], ["secretsmanager", "delete-secret"],
+  ]) {
+    assert.equal(isReadOnly(command), false, command.join(" "));
+    assert.throws(() => invocation(command, DEV), Refusal, command.join(" "));
+  }
+});
+
+test("list-functions is allowed, one CLI-paged call, and other Lambda calls are refused", () => {
+  assert.deepEqual(invocation(listFunctions(null), DEV), [
+    "lambda", "list-functions", `--max-items=${PAGE_SIZE}`, "--profile=dev", "--region=eu-west-1", "--output=json", "--no-cli-pager", "--no-cli-auto-prompt",
+  ]);
+  assert.ok(listFunctions("t").includes("--starting-token=t"));
+  assert.ok(!listFunctions("t").includes("--no-paginate"));
+  for (const command of [
+    ["lambda", "invoke", "--function-name=x"], ["lambda", "get-function", "--function-name=x"], ["lambda", "create-function"],
+    ["lambda", "delete-function", "--function-name=x"], ["lambda", "update-function-code"], ["lambda", "list-layers"],
   ]) {
     assert.equal(isReadOnly(command), false, command.join(" "));
     assert.throws(() => invocation(command, DEV), Refusal, command.join(" "));

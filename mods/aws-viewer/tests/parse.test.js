@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage } from "../parse.js";
+import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage } from "../parse.js";
 
 const fixture = (name) => JSON.parse(readFileSync(new URL(`./fixtures/${name}.json`, import.meta.url), "utf8"));
 
@@ -66,4 +66,13 @@ test("secrets page: metadata only, no value fields", () => {
   assert.equal(page.items[0].meta.description, "Example database login");
   assert.equal(page.nextToken, "example-secrets-token");
   assert.equal(secretsPage({}).nextToken, null);
+});
+
+test("Lambda functions page: name, runtime, memory, last modified, token", () => {
+  const page = functionsPage(fixture("lambda-list-functions"));
+  assert.deepEqual(page.items.map((i) => [i.kind, i.label]), [["lambda-function", "report-builder"], ["lambda-function", "image-fn"]]);
+  assert.deepEqual([page.items[0].meta.runtime, page.items[0].meta.memory], ["python3.12", 256]);
+  assert.equal(page.items[1].meta.runtime, "Image");
+  assert.equal(page.nextToken, "example-functions-token");
+  assert.equal(functionsPage({}).nextToken, null);
 });

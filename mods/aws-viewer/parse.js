@@ -94,6 +94,15 @@ export function policiesPage(json) {
   return { items, nextToken: json?.NextToken ?? null };
 }
 
+/** lambda list-functions: configuration metadata only, never code. */
+export function functionsPage(json) {
+  const items = (json?.Functions ?? []).map((f) => ({
+    id: `lambda:${f.FunctionName}`, kind: "lambda-function", label: f.FunctionName, name: f.FunctionName,
+    meta: { arn: f.FunctionArn ?? null, runtime: f.Runtime ?? f.PackageType ?? null, memory: f.MemorySize ?? null, lastModified: f.LastModified ?? null },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
 /** secretsmanager list-secrets: metadata only, never the secret value. */
 export function secretsPage(json) {
   const items = (json?.SecretList ?? []).map((s) => ({
