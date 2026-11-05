@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage, fileSystemsPage, clustersPage, clusterDetailsPage, dbInstancesPage, alarmsPage } from "../parse.js";
+import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage, fileSystemsPage, clustersPage, clusterDetailsPage, dbInstancesPage, alarmsPage, logGroupsPage } from "../parse.js";
 
 const fixture = (name) => JSON.parse(readFileSync(new URL(`./fixtures/${name}.json`, import.meta.url), "utf8"));
 
@@ -143,4 +143,13 @@ test("CloudWatch alarms page: state, metric, namespace, threshold, last update",
   assert.deepEqual(page.items[0].meta, { state: "ALARM", metric: "CPUUtilization", namespace: "AWS/EC2", threshold: 80, stateUpdated: "2024-06-01T10:15:00.000000+00:00" });
   assert.equal(page.nextToken, "example-alarms-token");
   assert.deepEqual(alarmsPage({}).items, []);
+});
+
+test("CloudWatch log groups page: stored bytes, retention, created date; no events", () => {
+  const page = logGroupsPage(fixture("logs-describe-log-groups"));
+  assert.deepEqual(page.items.map((i) => [i.kind, i.label]), [["cw-log-group", "/aws/lambda/example-fn"], ["cw-log-group", "/example/app"]]);
+  assert.deepEqual(page.items[0].meta, { storedBytes: 2048, retentionDays: 14, created: "2024-04-01T00:00:00.000Z" });
+  assert.deepEqual(page.items[1].meta, { storedBytes: 0, retentionDays: null, created: null });
+  assert.equal(page.nextToken, "example-loggroups-token");
+  assert.deepEqual(logGroupsPage({}).items, []);
 });

@@ -189,6 +189,18 @@ export function alarmsPage(json) {
   return { items, nextToken: json?.NextToken ?? null };
 }
 
+/** logs describe-log-groups: metadata only, never log events. creationTime is epoch milliseconds. */
+export function logGroupsPage(json) {
+  const items = (json?.logGroups ?? []).map((g) => ({
+    id: `cwl:${g.logGroupName}`, kind: "cw-log-group", label: g.logGroupName, name: g.logGroupName,
+    meta: {
+      storedBytes: g.storedBytes ?? null, retentionDays: g.retentionInDays ?? null,
+      created: typeof g.creationTime === "number" ? new Date(g.creationTime).toISOString() : null,
+    },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
 /** secretsmanager list-secrets: metadata only, never the secret value. */
 export function secretsPage(json) {
   const items = (json?.SecretList ?? []).map((s) => ({

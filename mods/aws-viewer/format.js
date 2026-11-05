@@ -1,6 +1,6 @@
 // How the details pane shows a leaf's metadata. Pure, so node --test covers it.
 
-/** [[label, value]] for an S3 object, SSM parameter, IAM resource, secret, Lambda function, ECR image, EC2 instance, EFS file system, EKS cluster, RDS instance or CloudWatch alarm; never a value or object content. */
+/** [[label, value]] for an S3 object, SSM parameter, IAM resource, secret, Lambda function, ECR image, EC2 instance, EFS file system, EKS cluster, RDS instance, CloudWatch alarm or log group; never a value or object content. */
 export function detailFields(node) {
   const m = node?.meta ?? {};
   if (node?.kind === "object") return [
@@ -57,6 +57,10 @@ export function detailFields(node) {
   if (node?.kind === "cw-alarm") return [
     ["Name", node.name], ["State", m.state ?? "—"], ["Metric", m.metric ?? "—"], ["Namespace", m.namespace ?? "—"],
     ["Threshold", m.threshold ?? "—"], ["Last state update", formatDate(m.stateUpdated)],
+  ];
+  if (node?.kind === "cw-log-group") return [
+    ["Name", node.name], ["Stored", sizeWithBytes(m.storedBytes)], ["Retention", m.retentionDays != null ? `${m.retentionDays} days` : "Never expire"],
+    ["Created", formatDate(m.created)],
   ];
   return [];
 }

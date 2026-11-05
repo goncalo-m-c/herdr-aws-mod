@@ -1,0 +1,16 @@
+{
+  "logGroups": [
+    {
+      "logGroupName": "/aws/lambda/example-fn",
+      "creationTime": 1711929600000,
+      "retentionInDays": 14,
+      "storedBytes": 2048,
+      "arn": "arn:aws:logs:eu-west-1:123456789012:log-group:/aws/lambda/example-fn:*"
+    },
+    {
+      "logGroupName": "/example/app",
+      "storedBytes": 0
+    }
+  ],
+  "NextToken": "example-loggroups-token"
+}

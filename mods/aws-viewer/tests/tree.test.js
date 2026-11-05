@@ -173,7 +173,7 @@ test("CloudWatch shows a group per region, each with its own folders that load i
   const tree = createTree(SERVICES, ["us-east-1", "eu-west-1"]);
   toggle(tree, "cloudwatch");
   toggle(tree, "cloudwatch@eu-west-1");
-  assert.deepEqual(types(tree).filter((t) => /CloudWatch|-1$|Alarms/.test(t)), ["node:CloudWatch", "node:us-east-1", "node:eu-west-1", "node:Alarms"]);
+  assert.deepEqual(types(tree).filter((t) => /CloudWatch|-1$|Alarms|Log groups/.test(t)), ["node:CloudWatch", "node:us-east-1", "node:eu-west-1", "node:Alarms", "node:Log groups"]);
   const id = "cloudwatch@eu-west-1:cw-alarms";
   assert.equal(tree.nodes.get(id).region, "eu-west-1");
   assert.equal(toggle(tree, id), true);
@@ -184,5 +184,5 @@ test("CloudWatch shows a group per region, each with its own folders that load i
 test("CloudWatch without regions is one root with its folders", () => {
   const tree = createTree(SERVICES, []);
   toggle(tree, "cloudwatch");
-  assert.deepEqual(types(tree).filter((t) => /CloudWatch|Alarms/.test(t)), ["node:CloudWatch", "node:Alarms"]);
+  assert.deepEqual(types(tree).filter((t) => /CloudWatch|Alarms|Log groups/.test(t)), ["node:CloudWatch", "node:Alarms", "node:Log groups"]);
 });

@@ -14,6 +14,7 @@ const NOTES = {
   "eks-details": "Metadata from eks describe-cluster. Certificate data and credentials are never read.",
   "rds-instance": "Metadata from rds describe-db-instances. Master usernames and passwords are never read or shown.",
   "cw-alarm": "Metadata from cloudwatch describe-alarms. Metric data is never read.",
+  "cw-log-group": "Metadata from logs describe-log-groups. Log events are never read.",
   "iam-user": "Metadata from iam list-users.",
   "iam-role": "Metadata from iam list-roles.",
   "iam-group": "Metadata from iam list-groups.",

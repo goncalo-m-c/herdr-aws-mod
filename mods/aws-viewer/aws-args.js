@@ -86,6 +86,11 @@ export function describeAlarms(token) {
   return ["cloudwatch", "describe-alarms", `--max-items=${PAGE_SIZE}`, ...tokenArg("--starting-token", token)];
 }
 
+/** Log group metadata only; log events are never read. Paged by the CLI like IAM. */
+export function describeLogGroups(token) {
+  return ["logs", "describe-log-groups", `--max-items=${PAGE_SIZE}`, ...tokenArg("--starting-token", token)];
+}
+
 /** The `regions` prop as a list of valid region names; throws Refusal on a bad one. Missing means []. */
 export function regionList(value) {
   if (value == null) return [];

@@ -1,7 +1,7 @@
 // Which aws call loads a folder node's next page, and which parser reads it.
 // Pure, so node --test covers it.
-import { listBuckets, listObjects, describeParameters, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, describeFileSystems, listClusters, describeCluster, describeDbInstances, describeAlarms } from "./aws-args.js";
-import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage, fileSystemsPage, clustersPage, clusterDetailsPage, dbInstancesPage, alarmsPage } from "./parse.js";
+import { listBuckets, listObjects, describeParameters, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, describeFileSystems, listClusters, describeCluster, describeDbInstances, describeAlarms, describeLogGroups } from "./aws-args.js";
+import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage, fileSystemsPage, clustersPage, clusterDetailsPage, dbInstancesPage, alarmsPage, logGroupsPage } from "./parse.js";
 
 // `regional: true` services get one group per listed region; the rest (global, like S3) show once.
 export const SERVICES = [
@@ -20,7 +20,7 @@ export const SERVICES = [
   { id: "rds", kind: "rds", label: "RDS", regional: true },
   // CloudWatch is regional with fixed folders: each region group holds Alarms and Log groups.
   { id: "cloudwatch", kind: "cloudwatch", label: "CloudWatch", regional: true, folders: [
-    { kind: "cw-alarms", label: "Alarms" },
+    { kind: "cw-alarms", label: "Alarms" }, { kind: "cw-log-groups", label: "Log groups" },
   ] },
   { id: "ssm", kind: "ssm", label: "SSM Parameter Store", path: "", regional: true },
 ];
@@ -43,6 +43,7 @@ const LOADERS = {
   "eks-cluster": { command: (node) => describeCluster(node.cluster), parse: (node, json) => clusterDetailsPage(json, node.cluster) },
   rds: { command: (_node, token) => describeDbInstances(token), parse: (_node, json) => dbInstancesPage(json) },
   "cw-alarms": { command: (_node, token) => describeAlarms(token), parse: (_node, json) => alarmsPage(json) },
+  "cw-log-groups": { command: (_node, token) => describeLogGroups(token), parse: (_node, json) => logGroupsPage(json) },
   ssm: { command: (node, token) => describeParameters(node.path, token), parse: (node, json) => parametersPage(json, node.path) },
   "ssm-path": { command: (node, token) => describeParameters(node.path, token), parse: (node, json) => parametersPage(json, node.path) },
 };

@@ -93,3 +93,9 @@ test("CloudWatch alarm details show name, state, metric, namespace, threshold an
   const fields = detailFields({ kind: "cw-alarm", name: "high-cpu", meta: { state: "ALARM", metric: "CPUUtilization", namespace: "AWS/EC2", threshold: 80, stateUpdated: "2024-06-01T10:15:00.000000+00:00" } });
   assert.deepEqual(fields, [["Name", "high-cpu"], ["State", "ALARM"], ["Metric", "CPUUtilization"], ["Namespace", "AWS/EC2"], ["Threshold", 80], ["Last state update", "2024-06-01 10:15 UTC"]]);
 });
+
+test("CloudWatch log group details show name, stored bytes, retention and created date", () => {
+  const fields = detailFields({ kind: "cw-log-group", name: "/example/app", meta: { storedBytes: 2048, retentionDays: 14, created: "2024-04-01T00:00:00.000Z" } });
+  assert.deepEqual(fields, [["Name", "/example/app"], ["Stored", "2 KB (2,048 bytes)"], ["Retention", "14 days"], ["Created", "2024-04-01 00:00 UTC"]]);
+  assert.equal(detailFields({ kind: "cw-log-group", name: "x", meta: {} })[2][1], "Never expire");
+});
