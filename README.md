@@ -74,6 +74,31 @@ The mod never writes to AWS. Only `s3api list-buckets`, `s3api list-objects-v2`,
 docker run --rm --network none -v "$PWD/mods/aws-viewer:/w:ro" -w /w node:22-slim node --test "tests/*.test.js"
 ```
 
+## Testing against a mock AWS
+
+The parser tests read JSON that was recorded from [moto](https://github.com/getmoto/moto), a mock AWS, so they use real response shapes and paging keys. You only need Docker. The scripts live in `scripts/` (not inside `mods/aws-viewer`, so they are not copied with the mod).
+
+```sh
+# Start moto, seed sample data, print a short count, remove moto (about a minute)
+scripts/mock-aws-seed.sh
+
+# Start moto, seed it, run every command the mod builds, save the JSON in mods/aws-viewer/tests/fixtures/
+scripts/mock-aws-record.sh
+
+# Run the tests on the recorded fixtures
+docker run --rm --network none -v "$PWD/mods/aws-viewer:/w:ro" -w /w node:22-slim node --test "tests/*.test.js"
+```
+
+Moto runs on a Docker network with no internet and publishes no port to your machine. The AWS CLI container uses the fake keys `test`/`test`; your `~/.aws` is never mounted. Both scripts remove the container and the network when they end, also on failure. The moto version is pinned in `scripts/mock-aws-common.sh`.
+
+A mock cannot prove:
+
+- Real permission errors (a mock accepts every call).
+- Throttling and retries.
+- Small differences from real AWS. For example, moto ignores the page size for S3 `list-buckets` and SSM `describe-parameters`, so those two have no recorded second page.
+
+Treat these tests as a check of response shapes, not of your account.
+
 ## License
 
 [MIT](LICENSE)
