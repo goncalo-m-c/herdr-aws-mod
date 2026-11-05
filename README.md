@@ -2,7 +2,17 @@
 
 A read-only AWS viewer for [Herdr](https://herdr.dev). It shows S3 buckets and SSM Parameter Store parameters as a lazy tree with a details pane. It is a prototype.
 
+![AWS Viewer](preview.png)
+
 See [RECIPE.md](RECIPE.md) for the full brief. The mod lives in `mods/aws-viewer/`.
+
+## Install
+
+Copy the mod folder into Herdr's mods directory:
+
+```sh
+cp -R mods/aws-viewer ~/.config/herdr-app/mods/aws-viewer
+```
 
 ## Open it
 
@@ -10,7 +20,12 @@ See [RECIPE.md](RECIPE.md) for the full brief. The mod lives in `mods/aws-viewer
 herdr-app do tab.new --mod aws-viewer --props '{}'
 ```
 
-Optional props: `profile` and `region`. Example: `--props '{"profile": "dev", "region": "eu-west-1"}'`.
+Launch props (both optional):
+
+- `profile`: the AWS profile to use.
+- `region`: the AWS region to use.
+
+Example: `--props '{"profile": "dev", "region": "eu-west-1"}'`.
 Without props, the mod reads `AWS_PROFILE`, then `AWS_REGION` or `AWS_DEFAULT_REGION`, from your login shell.
 The tab is renamed to the profile name, unless you named it yourself.
 
@@ -46,8 +61,12 @@ The mod never writes to AWS. Only `s3api list-buckets`, `s3api list-objects-v2`,
 ## Tests
 
 ```sh
-docker run --rm -v "$PWD/mods/aws-viewer:/w" -w /w node:22-slim node --test
+docker run --rm --network none -v "$PWD/mods/aws-viewer:/w:ro" -w /w node:22-slim node --test "tests/*.test.js"
 ```
+
+## License
+
+[MIT](LICENSE)
 
 ## Trademarks
 
