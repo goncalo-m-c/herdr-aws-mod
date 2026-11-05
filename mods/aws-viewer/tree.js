@@ -1,18 +1,27 @@
 // Lazy tree state: folders load on first open, one page at a time; stale results are dropped.
 // Pure, so node --test covers it. A "ticket" ties a load to the request that started it.
-import { isFolder } from "./resources.js";
+import { isFolder, isGroupNode } from "./resources.js";
 
 /** `regions` (optional): regional services get a "regions" node with one group per region. */
 export function createTree(services, regions = []) {
   const tree = { nodes: new Map(), roots: [], selected: null };
   for (const spec of services) {
     tree.roots.push(spec.id);
+    if (spec.folders) { addFixedFolders(tree, spec); continue; }
     if (!spec.regional || !regions.length) { tree.nodes.set(spec.id, makeNode(spec)); continue; }
     const groups = regions.map((region) => makeNode({ ...spec, id: `${spec.id}@${region}`, label: region, region }));
     for (const group of groups) tree.nodes.set(group.id, group);
     tree.nodes.set(spec.id, { ...makeNode({ id: spec.id, kind: "regions", label: spec.label }), loaded: true, children: groups.map((g) => g.id) });
   }
   return tree;
+}
+
+// A global service with fixed folders: the root is already loaded, each folder loads its own list.
+function addFixedFolders(tree, spec) {
+  const { folders, ...root } = spec;
+  const children = folders.map((folder) => makeNode({ ...folder, id: `${spec.id}:${folder.kind}` }));
+  for (const child of children) tree.nodes.set(child.id, child);
+  tree.nodes.set(spec.id, { ...makeNode(root), loaded: true, children: children.map((c) => c.id) });
 }
 
 /** Opens or closes a folder; returns true when it now needs its first page. */
@@ -58,7 +67,7 @@ export function failLoad(tree, id, ticket, message) {
 /** Forgets a folder's pages and opens it; any load in flight for it becomes stale. */
 export function refresh(tree, id) {
   const node = tree.nodes.get(id);
-  if (!node || !isFolder(node) || node.kind === "regions") return false;
+  if (!node || !isFolder(node) || isGroupNode(node)) return false;
   dropChildren(tree, node);
   Object.assign(node, { open: true, loaded: false, loading: false, error: null, nextToken: null, request: node.request + 1 });
   return true;

@@ -1,11 +1,16 @@
 // Which aws call loads a folder node's next page, and which parser reads it.
 // Pure, so node --test covers it.
-import { listBuckets, listObjects, describeParameters } from "./aws-args.js";
-import { bucketsPage, objectsPage, parametersPage } from "./parse.js";
+import { listBuckets, listObjects, describeParameters, listUsers, listRoles, listGroups, listLocalPolicies } from "./aws-args.js";
+import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage } from "./parse.js";
 
 // `regional: true` services get one group per listed region; the rest (global, like S3) show once.
 export const SERVICES = [
   { id: "s3", kind: "s3", label: "S3" },
+  // IAM is global: shown once, with fixed folders (no call) that each list one kind of IAM resource.
+  { id: "iam", kind: "iam", label: "IAM", folders: [
+    { kind: "iam-users", label: "Users" }, { kind: "iam-roles", label: "Roles" },
+    { kind: "iam-groups", label: "Groups" }, { kind: "iam-policies", label: "Policies (local)" },
+  ] },
   { id: "ssm", kind: "ssm", label: "SSM Parameter Store", path: "", regional: true },
 ];
 
@@ -13,12 +18,21 @@ const LOADERS = {
   s3: { command: (_node, token) => listBuckets(token), parse: (_node, json) => bucketsPage(json) },
   bucket: { command: (node, token) => listObjects(node.bucket, "", token), parse: (node, json) => objectsPage(json, node.bucket, "") },
   prefix: { command: (node, token) => listObjects(node.bucket, node.prefix, token), parse: (node, json) => objectsPage(json, node.bucket, node.prefix) },
+  "iam-users": { command: (_node, token) => listUsers(token), parse: (_node, json) => usersPage(json) },
+  "iam-roles": { command: (_node, token) => listRoles(token), parse: (_node, json) => rolesPage(json) },
+  "iam-groups": { command: (_node, token) => listGroups(token), parse: (_node, json) => groupsPage(json) },
+  "iam-policies": { command: (_node, token) => listLocalPolicies(token), parse: (_node, json) => policiesPage(json) },
   ssm: { command: (node, token) => describeParameters(node.path, token), parse: (node, json) => parametersPage(json, node.path) },
   "ssm-path": { command: (node, token) => describeParameters(node.path, token), parse: (node, json) => parametersPage(json, node.path) },
 };
 
 export function isFolder(node) {
-  return Boolean(node && (LOADERS[node.kind] || node.kind === "regions"));
+  return Boolean(node && (LOADERS[node.kind] || isGroupNode(node)));
+}
+
+/** Folders that only hold other folders and make no aws call: region groups and the IAM root. */
+export function isGroupNode(node) {
+  return node?.kind === "regions" || node?.kind === "iam";
 }
 
 /** The aws command (without --profile/--region) for one page; `token` null = first page. */

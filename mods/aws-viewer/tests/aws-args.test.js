@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
+import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
 
 const DEV = { profile: "dev", region: "eu-west-1" };
 
@@ -64,4 +64,21 @@ test("regions prop: valid names pass, missing means none, a bad name is refused"
   assert.deepEqual(regionList(undefined), []);
   assert.throws(() => regionList(["us-east-1", "nope; rm"]), Refusal);
   assert.throws(() => regionList("us-east-1"), Refusal);
+});
+
+test("IAM list calls are allowed, one bounded page each, with the CLI token", () => {
+  assert.deepEqual(invocation(listUsers(null), DEV), [
+    "iam", "list-users", `--max-items=${PAGE_SIZE}`, "--profile=dev", "--region=eu-west-1", "--output=json", "--no-cli-pager", "--no-cli-auto-prompt",
+  ]);
+  assert.ok(listRoles("t").includes("--starting-token=t"));
+  assert.ok(listGroups(null).includes(`--max-items=${PAGE_SIZE}`));
+  assert.ok(listLocalPolicies(null).includes("--scope=Local"));
+  for (const command of [listUsers(null), listRoles(null), listGroups(null), listLocalPolicies("t")]) assert.ok(isReadOnly(command));
+});
+
+test("IAM write and other read calls are refused", () => {
+  for (const command of [
+    ["iam", "create-user", "--user-name=x"], ["iam", "delete-role", "--role-name=x"], ["iam", "attach-user-policy"],
+    ["iam", "create-access-key"], ["iam", "get-user"], ["iam", "list-access-keys"], ["iam", "get-policy-version"],
+  ]) assert.throws(() => invocation(command, DEV), Refusal, command.join(" "));
 });

@@ -1,0 +1,7 @@
+{
+    "Users": [
+        { "Path": "/", "UserName": "alice", "UserId": "AIDAEXAMPLEUSERID001", "Arn": "arn:aws:iam::123456789012:user/alice", "CreateDate": "2024-01-15T10:00:00+00:00", "PasswordLastUsed": "2024-05-01T08:30:00+00:00" },
+        { "Path": "/ci/", "UserName": "bot", "UserId": "AIDAEXAMPLEUSERID002", "Arn": "arn:aws:iam::123456789012:user/ci/bot", "CreateDate": "2024-02-20T12:00:00+00:00" }
+    ],
+    "NextToken": "example-users-token"
+}

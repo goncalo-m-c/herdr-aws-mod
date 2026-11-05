@@ -6,6 +6,10 @@ import { detailFields } from "./format.js";
 const NOTES = {
   object: "Metadata from the bucket listing. Object contents are never downloaded.",
   parameter: "Metadata from describe-parameters. Parameter values are never read or shown.",
+  "iam-user": "Metadata from iam list-users.",
+  "iam-role": "Metadata from iam list-roles.",
+  "iam-group": "Metadata from iam list-groups.",
+  "iam-policy": "Metadata from iam list-policies --scope Local.",
 };
 
 export function detailsPane(node, t) {

@@ -54,3 +54,42 @@ function parameterItem(parameter, path) {
 function withoutTrailingSlash(text) {
   return text.endsWith("/") ? text.slice(0, -1) : text;
 }
+
+/** iam list-users */
+export function usersPage(json) {
+  const items = (json?.Users ?? []).map((u) => ({
+    id: `iamu:${u.UserName}`, kind: "iam-user", label: u.UserName, name: u.UserName,
+    meta: { arn: u.Arn ?? null, id: u.UserId ?? null, path: u.Path ?? null, created: u.CreateDate ?? null, passwordLastUsed: u.PasswordLastUsed ?? null },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
+/** iam list-roles */
+export function rolesPage(json) {
+  const items = (json?.Roles ?? []).map((r) => ({
+    id: `iamr:${r.RoleName}`, kind: "iam-role", label: r.RoleName, name: r.RoleName,
+    meta: { arn: r.Arn ?? null, id: r.RoleId ?? null, path: r.Path ?? null, created: r.CreateDate ?? null, description: r.Description ?? null, maxSessionDuration: r.MaxSessionDuration ?? null },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
+/** iam list-groups */
+export function groupsPage(json) {
+  const items = (json?.Groups ?? []).map((g) => ({
+    id: `iamg:${g.GroupName}`, kind: "iam-group", label: g.GroupName, name: g.GroupName,
+    meta: { arn: g.Arn ?? null, id: g.GroupId ?? null, path: g.Path ?? null, created: g.CreateDate ?? null },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
+/** iam list-policies --scope Local */
+export function policiesPage(json) {
+  const items = (json?.Policies ?? []).map((p) => ({
+    id: `iamp:${p.PolicyName}`, kind: "iam-policy", label: p.PolicyName, name: p.PolicyName,
+    meta: {
+      arn: p.Arn ?? null, id: p.PolicyId ?? null, path: p.Path ?? null, created: p.CreateDate ?? null, updated: p.UpdateDate ?? null,
+      attachmentCount: p.AttachmentCount ?? null, defaultVersion: p.DefaultVersionId ?? null,
+    },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}

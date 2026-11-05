@@ -38,6 +38,13 @@ test("details show metadata fields only", () => {
   assert.equal(formatDate("2024-04-10T14:22:31.123000+00:00"), "2024-04-10 14:22 UTC");
 });
 
+test("IAM details show main fields", () => {
+  const user = detailFields({ kind: "iam-user", name: "alice", meta: { arn: "arn:aws:iam::123456789012:user/alice", created: "2024-01-15T10:00:00+00:00" } });
+  assert.deepEqual(user.map(([l]) => l), ["Name", "ARN", "User ID", "Path", "Created", "Password last used"]);
+  assert.deepEqual(user[4], ["Created", "2024-01-15 10:00 UTC"]);
+  for (const kind of ["iam-role", "iam-group", "iam-policy"]) assert.ok(detailFields({ kind, name: "x" }).length >= 5, kind);
+});
+
 test("source never reads values, writes files or logs, and runs aws in one place", () => {
   const dir = new URL("../", import.meta.url);
   const sources = readdirSync(dir).filter((f) => f.endsWith(".js")).map((f) => [f, readFileSync(new URL(f, dir), "utf8")]);
