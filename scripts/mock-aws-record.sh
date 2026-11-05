@@ -49,4 +49,8 @@ while IFS=$'\t' read -r name region argv; do
     *" $name "*) if [ -z "$region" ] || [ "$region" = us-east-1 ]; then record_pages "$name" "$region"; fi ;;
   esac
 done < <(commands)
+# moto invents random public IPs (54.214.x.x, an AWS range). Replace them with a documentation address (RFC 5737).
+for f in "$OUT"/*.json; do
+  sed -E -i.bak -e 's/54\.214\.[0-9]+\.[0-9]+/203.0.113.7/g' -e 's/54-214-[0-9]+-[0-9]+/203-0-113-7/g' "$f" && rm -f "$f.bak"
+done
 echo "Recorded $(ls "$OUT" | wc -l | tr -d ' ') files in $OUT"
