@@ -19,6 +19,7 @@ A read-only AWS resource viewer laid out like a file browser. It covers S3 and S
 - The profile comes from `AWS_PROFILE`, read from your login shell (`$SHELL -lc`). Herdr's own environment may lack it.
 - The region comes from `AWS_REGION`, else `AWS_DEFAULT_REGION`. If neither is set, the profile's config region applies.
 - Props override both: `{"profile": "dev", "region": "eu-west-1"}`.
+- The `regions` prop lists several regions: `{"profile": "dev", "regions": ["us-east-1", "eu-west-1"]}`. Regional services (SSM) show one group per region, and every call under a group gets that group's `--region`. Global services (S3) show once. A name that does not look like `xx-name-N` is refused. Without `regions`, one region is used as before.
 
 ## The aws commands it runs
 

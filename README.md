@@ -20,12 +20,15 @@ cp -R mods/aws-viewer ~/.config/herdr-app/mods/aws-viewer
 herdr-app do tab.new --mod aws-viewer --props '{}'
 ```
 
-Launch props (both optional):
+Launch props (all optional):
 
 - `profile`: the AWS profile to use.
 - `region`: the AWS region to use.
+- `regions`: a list of AWS regions. Regional services (SSM) show one group per region. Global services (S3) show once.
 
 Example: `--props '{"profile": "dev", "region": "eu-west-1"}'`.
+Several regions: `--props '{"profile": "dev", "regions": ["us-east-1", "eu-west-1"]}'`.
+An invalid region name is refused and nothing is shown. Without `regions`, the viewer uses one region as before.
 Without props, the mod reads `AWS_PROFILE`, then `AWS_REGION` or `AWS_DEFAULT_REGION`, from your login shell.
 The tab is renamed to the profile name, unless you named it yourself.
 
