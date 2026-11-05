@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
+import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, describeFileSystems, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
 
 const DEV = { profile: "dev", region: "eu-west-1" };
 
@@ -140,6 +140,18 @@ test("EC2 describe-instances is allowed, CLI-paged, and writes and risky reads a
     ["ec2", "run-instances"], ["ec2", "terminate-instances", "--instance-ids=i-0123456789EXAMPLE1"], ["ec2", "get-console-output", "--instance-id=i-0123456789EXAMPLE1"],
     ["ec2", "get-password-data", "--instance-id=i-0123456789EXAMPLE1"], ["ec2", "describe-instance-attribute", "--attribute=userData"], ["ec2", "start-instances"],
   ]) {
+    assert.equal(isReadOnly(command), false, command.join(" "));
+    assert.throws(() => invocation(command, DEV), Refusal, command.join(" "));
+  }
+});
+
+test("EFS describe-file-systems is allowed, CLI-paged, and writes are refused", () => {
+  assert.deepEqual(invocation(describeFileSystems(null), DEV), [
+    "efs", "describe-file-systems", `--max-items=${PAGE_SIZE}`, "--profile=dev", "--region=eu-west-1", "--output=json", "--no-cli-pager", "--no-cli-auto-prompt",
+  ]);
+  assert.ok(describeFileSystems("t").includes("--starting-token=t"));
+  assert.ok(!describeFileSystems("t").includes("--no-paginate"));
+  for (const command of [["efs", "create-file-system"], ["efs", "delete-file-system", "--file-system-id=x"], ["efs", "describe-file-system-policy"], ["efs", "describe-mount-targets"]]) {
     assert.equal(isReadOnly(command), false, command.join(" "));
     assert.throws(() => invocation(command, DEV), Refusal, command.join(" "));
   }

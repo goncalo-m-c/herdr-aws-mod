@@ -1,0 +1,20 @@
+{
+  "FileSystems": [
+    {
+      "OwnerId": "123456789012",
+      "FileSystemId": "fs-0123EXAMPLE1",
+      "Name": "shared-data",
+      "LifeCycleState": "available",
+      "PerformanceMode": "generalPurpose",
+      "SizeInBytes": { "Value": 6144, "Timestamp": "2024-05-01T08:30:00+00:00" }
+    },
+    {
+      "OwnerId": "123456789012",
+      "FileSystemId": "fs-0123EXAMPLE2",
+      "LifeCycleState": "creating",
+      "PerformanceMode": "maxIO",
+      "SizeInBytes": { "Value": 0 }
+    }
+  ],
+  "NextToken": "example-filesystems-token"
+}

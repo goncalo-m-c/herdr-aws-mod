@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage } from "../parse.js";
+import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage, fileSystemsPage } from "../parse.js";
 
 const fixture = (name) => JSON.parse(readFileSync(new URL(`./fixtures/${name}.json`, import.meta.url), "utf8"));
 
@@ -100,4 +100,12 @@ test("EC2 instances page: flattens reservations, keeps only the Name tag, never 
   assert.ok(!JSON.stringify(page).includes("EXAMPLE-NOT-SHOWN") && !JSON.stringify(page).includes("Env"));
   assert.equal(page.nextToken, "example-instances-token");
   assert.deepEqual(instancesPage({}).items, []);
+});
+
+test("EFS file systems page: id, name, size, performance mode, state, token", () => {
+  const page = fileSystemsPage(fixture("efs-describe-file-systems"));
+  assert.deepEqual(page.items.map((i) => [i.kind, i.label]), [["efs-filesystem", "shared-data"], ["efs-filesystem", "fs-0123EXAMPLE2"]]);
+  assert.deepEqual(page.items[0].meta, { id: "fs-0123EXAMPLE1", size: 6144, performanceMode: "generalPurpose", state: "available" });
+  assert.equal(page.nextToken, "example-filesystems-token");
+  assert.deepEqual(fileSystemsPage({}).items, []);
 });

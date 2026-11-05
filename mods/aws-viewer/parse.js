@@ -137,6 +137,15 @@ export function instancesPage(json) {
   return { items, nextToken: json?.NextToken ?? null };
 }
 
+/** efs describe-file-systems: metadata only, never file contents. Unnamed file systems are labelled by id. */
+export function fileSystemsPage(json) {
+  const items = (json?.FileSystems ?? []).map((f) => ({
+    id: `efs:${f.FileSystemId}`, kind: "efs-filesystem", label: f.Name || f.FileSystemId, name: f.Name || f.FileSystemId,
+    meta: { id: f.FileSystemId ?? null, size: f.SizeInBytes?.Value ?? null, performanceMode: f.PerformanceMode ?? null, state: f.LifeCycleState ?? null },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
 /** secretsmanager list-secrets: metadata only, never the secret value. */
 export function secretsPage(json) {
   const items = (json?.SecretList ?? []).map((s) => ({
