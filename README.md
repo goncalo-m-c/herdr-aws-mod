@@ -105,5 +105,4 @@ Treat these tests as a check of response shapes, not of your account.
 
 ## Trademarks
 
-AWS, Amazon S3 and the AWS logos belong to Amazon. This project is not affiliated with, endorsed by or sponsored by AWS.
-The mod ships a neutral cloud icon. If you want an AWS logo, add your own locally and follow AWS's terms.
+AWS and Amazon S3 are trademarks of Amazon.com, Inc. or its affiliates. This project is not affiliated with, endorsed by or sponsored by AWS.
