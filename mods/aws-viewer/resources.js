@@ -3,9 +3,10 @@
 import { listBuckets, listObjects, describeParameters } from "./aws-args.js";
 import { bucketsPage, objectsPage, parametersPage } from "./parse.js";
 
+// `regional: true` services get one group per listed region; the rest (global, like S3) show once.
 export const SERVICES = [
   { id: "s3", kind: "s3", label: "S3" },
-  { id: "ssm", kind: "ssm", label: "SSM Parameter Store", path: "" },
+  { id: "ssm", kind: "ssm", label: "SSM Parameter Store", path: "", regional: true },
 ];
 
 const LOADERS = {
