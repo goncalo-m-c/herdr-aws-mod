@@ -1,0 +1,11 @@
+{
+    "IsTruncated": false,
+    "Contents": [
+        { "Key": "reports/zzz.json", "LastModified": "2024-06-01T00:00:00+00:00", "ETag": "\"aa\"", "Size": 20, "StorageClass": "STANDARD" }
+    ],
+    "Name": "my-bucket",
+    "Prefix": "reports/",
+    "Delimiter": "/",
+    "MaxKeys": 50,
+    "KeyCount": 1
+}

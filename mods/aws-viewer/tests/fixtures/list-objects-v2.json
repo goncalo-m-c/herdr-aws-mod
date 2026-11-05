@@ -1,0 +1,14 @@
+{
+    "IsTruncated": true,
+    "Contents": [
+        { "Key": "reports/", "LastModified": "2024-05-01T12:00:00+00:00", "ETag": "\"d41d8cd98f00b204e9800998ecf8427e\"", "Size": 0, "StorageClass": "STANDARD" },
+        { "Key": "reports/2024-05.csv", "LastModified": "2024-05-02T09:30:12+00:00", "ETag": "\"9b2cf535f27731c974343645a3985328\"", "Size": 1536, "StorageClass": "STANDARD_IA" }
+    ],
+    "Name": "my-bucket",
+    "Prefix": "reports/",
+    "Delimiter": "/",
+    "MaxKeys": 50,
+    "CommonPrefixes": [ { "Prefix": "reports/archive/" }, { "Prefix": "reports/daily/" } ],
+    "KeyCount": 4,
+    "NextContinuationToken": "1ueGcxLPRx1Tr/XYExHnhbYLgveDs2J/wm36Hy4vbOwM="
+}
