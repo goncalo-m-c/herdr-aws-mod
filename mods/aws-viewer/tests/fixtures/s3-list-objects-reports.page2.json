@@ -1,0 +1,17 @@
+{
+    "IsTruncated": false,
+    "Name": "reports-bucket",
+    "Prefix": "reports/",
+    "Delimiter": "/",
+    "MaxKeys": 2,
+    "CommonPrefixes": [
+        {
+            "Prefix": "reports/archive/"
+        },
+        {
+            "Prefix": "reports/daily/"
+        }
+    ],
+    "EncodingType": "url",
+    "KeyCount": 2
+}

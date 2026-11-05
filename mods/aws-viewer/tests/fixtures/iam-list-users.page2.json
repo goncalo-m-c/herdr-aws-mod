@@ -1,0 +1,11 @@
+{
+    "Users": [
+        {
+            "Path": "/",
+            "UserName": "carol",
+            "UserId": "b2ufikw1id4erryjcyos",
+            "Arn": "arn:aws:iam::123456789012:user/carol",
+            "CreateDate": "2026-11-05T20:54:31.307502+00:00"
+        }
+    ]
+}

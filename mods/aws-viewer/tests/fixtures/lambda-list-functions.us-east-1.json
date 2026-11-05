@@ -1,0 +1,97 @@
+{
+    "Functions": [
+        {
+            "FunctionName": "report-builder",
+            "FunctionArn": "arn:aws:lambda:us-east-1:123456789012:function:report-builder",
+            "Runtime": "python3.12",
+            "Role": "arn:aws:iam::123456789012:role/lambda-exec-us-east-1",
+            "Handler": "app.handler",
+            "CodeSize": 22,
+            "Description": "",
+            "Timeout": 3,
+            "MemorySize": 256,
+            "LastModified": "2026-11-05T20:54:46.861055000Z",
+            "CodeSha256": "hznHbmgfkAkjuQDJ3w73XPQh05yrtUZQxLmtGbanbYU=",
+            "Version": "$LATEST",
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "Layers": [],
+            "State": "Active",
+            "LastUpdateStatus": "Successful",
+            "PackageType": "Zip",
+            "Architectures": [
+                "x86_64"
+            ],
+            "EphemeralStorage": {
+                "Size": 512
+            },
+            "SnapStart": {
+                "ApplyOn": "None",
+                "OptimizationStatus": "Off"
+            }
+        },
+        {
+            "FunctionName": "image-resizer",
+            "FunctionArn": "arn:aws:lambda:us-east-1:123456789012:function:image-resizer",
+            "Runtime": "python3.12",
+            "Role": "arn:aws:iam::123456789012:role/lambda-exec-us-east-1",
+            "Handler": "app.handler",
+            "CodeSize": 22,
+            "Description": "",
+            "Timeout": 3,
+            "MemorySize": 256,
+            "LastModified": "2026-11-05T20:54:47.407144000Z",
+            "CodeSha256": "hznHbmgfkAkjuQDJ3w73XPQh05yrtUZQxLmtGbanbYU=",
+            "Version": "$LATEST",
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "Layers": [],
+            "State": "Active",
+            "LastUpdateStatus": "Successful",
+            "PackageType": "Zip",
+            "Architectures": [
+                "x86_64"
+            ],
+            "EphemeralStorage": {
+                "Size": 512
+            },
+            "SnapStart": {
+                "ApplyOn": "None",
+                "OptimizationStatus": "Off"
+            }
+        },
+        {
+            "FunctionName": "cleanup",
+            "FunctionArn": "arn:aws:lambda:us-east-1:123456789012:function:cleanup",
+            "Runtime": "python3.12",
+            "Role": "arn:aws:iam::123456789012:role/lambda-exec-us-east-1",
+            "Handler": "app.handler",
+            "CodeSize": 22,
+            "Description": "",
+            "Timeout": 3,
+            "MemorySize": 256,
+            "LastModified": "2026-11-05T20:54:47.926332000Z",
+            "CodeSha256": "hznHbmgfkAkjuQDJ3w73XPQh05yrtUZQxLmtGbanbYU=",
+            "Version": "$LATEST",
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "Layers": [],
+            "State": "Active",
+            "LastUpdateStatus": "Successful",
+            "PackageType": "Zip",
+            "Architectures": [
+                "x86_64"
+            ],
+            "EphemeralStorage": {
+                "Size": 512
+            },
+            "SnapStart": {
+                "ApplyOn": "None",
+                "OptimizationStatus": "Off"
+            }
+        }
+    ]
+}

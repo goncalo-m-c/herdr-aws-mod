@@ -54,3 +54,158 @@ function parameterItem(parameter, path) {
 function withoutTrailingSlash(text) {
   return text.endsWith("/") ? text.slice(0, -1) : text;
 }
+
+/** iam list-users */
+export function usersPage(json) {
+  const items = (json?.Users ?? []).map((u) => ({
+    id: `iamu:${u.UserName}`, kind: "iam-user", label: u.UserName, name: u.UserName,
+    meta: { arn: u.Arn ?? null, id: u.UserId ?? null, path: u.Path ?? null, created: u.CreateDate ?? null, passwordLastUsed: u.PasswordLastUsed ?? null },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
+/** iam list-roles */
+export function rolesPage(json) {
+  const items = (json?.Roles ?? []).map((r) => ({
+    id: `iamr:${r.RoleName}`, kind: "iam-role", label: r.RoleName, name: r.RoleName,
+    meta: { arn: r.Arn ?? null, id: r.RoleId ?? null, path: r.Path ?? null, created: r.CreateDate ?? null, description: r.Description ?? null, maxSessionDuration: r.MaxSessionDuration ?? null },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
+/** iam list-groups */
+export function groupsPage(json) {
+  const items = (json?.Groups ?? []).map((g) => ({
+    id: `iamg:${g.GroupName}`, kind: "iam-group", label: g.GroupName, name: g.GroupName,
+    meta: { arn: g.Arn ?? null, id: g.GroupId ?? null, path: g.Path ?? null, created: g.CreateDate ?? null },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
+/** iam list-policies --scope Local */
+export function policiesPage(json) {
+  const items = (json?.Policies ?? []).map((p) => ({
+    id: `iamp:${p.PolicyName}`, kind: "iam-policy", label: p.PolicyName, name: p.PolicyName,
+    meta: {
+      arn: p.Arn ?? null, id: p.PolicyId ?? null, path: p.Path ?? null, created: p.CreateDate ?? null, updated: p.UpdateDate ?? null,
+      attachmentCount: p.AttachmentCount ?? null, defaultVersion: p.DefaultVersionId ?? null,
+    },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
+/** lambda list-functions: configuration metadata only, never code. */
+export function functionsPage(json) {
+  const items = (json?.Functions ?? []).map((f) => ({
+    id: `lambda:${f.FunctionName}`, kind: "lambda-function", label: f.FunctionName, name: f.FunctionName,
+    meta: { arn: f.FunctionArn ?? null, runtime: f.Runtime ?? f.PackageType ?? null, memory: f.MemorySize ?? null, lastModified: f.LastModified ?? null },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
+/** ecr describe-repositories: each repository is a folder of images. */
+export function repositoriesPage(json) {
+  const items = (json?.repositories ?? []).map((r) => ({
+    id: `ecr:${r.repositoryName}`, kind: "ecr-repo", label: r.repositoryName, repository: r.repositoryName,
+    meta: { arn: r.repositoryArn ?? null, uri: r.repositoryUri ?? null, created: r.createdAt ?? null },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
+/** ecr describe-images: metadata only, never image layers. Untagged images are labelled by a short digest. */
+export function imagesPage(json, repository) {
+  const items = (json?.imageDetails ?? []).map((d) => {
+    const tags = d.imageTags ?? [];
+    const digest = d.imageDigest ?? "";
+    return {
+      id: `ecri:${repository}/${digest}`, kind: "ecr-image", label: tags.length ? tags.join(", ") : digest.slice(0, 19) || "(untagged)", name: repository, repository,
+      meta: { tags, digest: digest || null, pushed: d.imagePushedAt ?? null, size: d.imageSizeInBytes ?? null },
+    };
+  });
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
+/** ec2 describe-instances: instances sit under Reservations[].Instances[]. Only the Name tag is kept; never user data or other tags. */
+export function instancesPage(json) {
+  const items = (json?.Reservations ?? []).flatMap((r) => r.Instances ?? []).map((i) => {
+    const name = (i.Tags ?? []).find((tag) => tag.Key === "Name")?.Value || null;
+    return {
+      id: `ec2:${i.InstanceId}`, kind: "ec2-instance", label: name || i.InstanceId, name: name || i.InstanceId,
+      meta: { id: i.InstanceId ?? null, state: i.State?.Name ?? null, type: i.InstanceType ?? null, zone: i.Placement?.AvailabilityZone ?? null, privateIp: i.PrivateIpAddress ?? null },
+    };
+  });
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
+/** efs describe-file-systems: metadata only, never file contents. Unnamed file systems are labelled by id. */
+export function fileSystemsPage(json) {
+  const items = (json?.FileSystems ?? []).map((f) => ({
+    id: `efs:${f.FileSystemId}`, kind: "efs-filesystem", label: f.Name || f.FileSystemId, name: f.Name || f.FileSystemId,
+    meta: { id: f.FileSystemId ?? null, size: f.SizeInBytes?.Value ?? null, performanceMode: f.PerformanceMode ?? null, state: f.LifeCycleState ?? null },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
+/** eks list-clusters: names only; each cluster is a folder that opens to its details. */
+export function clustersPage(json) {
+  const items = (json?.clusters ?? []).map((name) => ({ id: `eks:${name}`, kind: "eks-cluster", label: name, cluster: name }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
+/** eks describe-cluster: one details leaf. Version, status, endpoint and created date only; no certificate data. */
+export function clusterDetailsPage(json, cluster) {
+  const c = json?.cluster;
+  if (!c) return { items: [], nextToken: null };
+  return {
+    items: [{
+      id: `eksd:${cluster}`, kind: "eks-details", label: [c.version && `v${c.version}`, c.status].filter(Boolean).join(" ") || "Details", name: c.name ?? cluster, cluster,
+      meta: { version: c.version ?? null, status: c.status ?? null, endpoint: c.endpoint ?? null, created: c.createdAt ?? null },
+    }],
+    nextToken: null,
+  };
+}
+
+/** rds describe-db-instances: connection facts only; the master username is never kept. */
+export function dbInstancesPage(json) {
+  const items = (json?.DBInstances ?? []).map((d) => ({
+    id: `rds:${d.DBInstanceIdentifier}`, kind: "rds-instance", label: d.DBInstanceIdentifier, name: d.DBInstanceIdentifier,
+    meta: {
+      engine: d.Engine ?? null, version: d.EngineVersion ?? null, class: d.DBInstanceClass ?? null, status: d.DBInstanceStatus ?? null,
+      endpoint: d.Endpoint?.Address ? `${d.Endpoint.Address}${d.Endpoint.Port ? `:${d.Endpoint.Port}` : ""}` : null,
+    },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
+/** cloudwatch describe-alarms: metric alarms only (composite alarms have no metric or threshold). */
+export function alarmsPage(json) {
+  const items = (json?.MetricAlarms ?? []).map((a) => ({
+    id: `cwa:${a.AlarmName}`, kind: "cw-alarm", label: a.AlarmName, name: a.AlarmName,
+    meta: {
+      state: a.StateValue ?? null, metric: a.MetricName ?? null, namespace: a.Namespace ?? null,
+      threshold: a.Threshold ?? null, stateUpdated: a.StateUpdatedTimestamp ?? null,
+    },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
+/** logs describe-log-groups: metadata only, never log events. creationTime is epoch milliseconds. */
+export function logGroupsPage(json) {
+  const items = (json?.logGroups ?? []).map((g) => ({
+    id: `cwl:${g.logGroupName}`, kind: "cw-log-group", label: g.logGroupName, name: g.logGroupName,
+    meta: {
+      storedBytes: g.storedBytes ?? null, retentionDays: g.retentionInDays ?? null,
+      created: typeof g.creationTime === "number" ? new Date(g.creationTime).toISOString() : null,
+    },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
+/** secretsmanager list-secrets: metadata only, never the secret value. */
+export function secretsPage(json) {
+  const items = (json?.SecretList ?? []).map((s) => ({
+    id: `sm:${s.Name}`, kind: "secret", label: s.Name, name: s.Name,
+    meta: { arn: s.ARN ?? null, description: s.Description ?? null, lastChanged: s.LastChangedDate ?? null, lastAccessed: s.LastAccessedDate ?? null, created: s.CreatedDate ?? null },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}

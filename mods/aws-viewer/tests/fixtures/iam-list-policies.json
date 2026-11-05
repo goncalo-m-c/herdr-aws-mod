@@ -1,0 +1,15 @@
+{
+    "Policies": [
+        {
+            "PolicyName": "read-reports",
+            "PolicyId": "ALO4H8SUQ496GMU03LTH9",
+            "Arn": "arn:aws:iam::123456789012:policy/read-reports",
+            "Path": "/",
+            "DefaultVersionId": "v1",
+            "AttachmentCount": 0,
+            "IsAttachable": true,
+            "CreateDate": "2026-11-05T20:54:35.010257+00:00",
+            "UpdateDate": "2026-11-05T20:54:35.010257+00:00"
+        }
+    ]
+}

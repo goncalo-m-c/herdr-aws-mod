@@ -1,0 +1,117 @@
+{
+    "DBInstances": [
+        {
+            "DBInstanceIdentifier": "orders-db",
+            "DBInstanceClass": "db.t3.micro",
+            "Engine": "postgres",
+            "DBInstanceStatus": "available",
+            "MasterUsername": "sample_admin",
+            "Endpoint": {
+                "Address": "orders-db.aaaaaaaaaa.us-east-1.rds.amazonaws.com",
+                "Port": 5432
+            },
+            "AllocatedStorage": 20,
+            "InstanceCreateTime": "2026-11-05T20:54:57.304308+00:00",
+            "PreferredBackupWindow": "13:14-13:44",
+            "BackupRetentionPeriod": 1,
+            "DBSecurityGroups": [],
+            "VpcSecurityGroups": [
+                {
+                    "VpcSecurityGroupId": "sg-a74466e099bfe0ee9",
+                    "Status": "active"
+                }
+            ],
+            "DBParameterGroups": [
+                {
+                    "DBParameterGroupName": "default.postgres9.3",
+                    "ParameterApplyStatus": "in-sync"
+                }
+            ],
+            "AvailabilityZone": "us-east-1a",
+            "PreferredMaintenanceWindow": "wed:06:38-wed:07:08",
+            "LatestRestorableTime": "2026-11-05T20:55:56.009369+00:00",
+            "MultiAZ": false,
+            "EngineVersion": "9.3.3",
+            "AutoMinorVersionUpgrade": true,
+            "ReadReplicaDBInstanceIdentifiers": [],
+            "LicenseModel": "general-public-license",
+            "OptionGroupMemberships": [
+                {
+                    "OptionGroupName": "default:postgres-9-3",
+                    "Status": "in-sync"
+                }
+            ],
+            "StorageType": "gp2",
+            "DbInstancePort": 5432,
+            "StorageEncrypted": false,
+            "DbiResourceId": "db-M5ENSHXFPU6XHZ4G4ZEI5QIO2U",
+            "CACertificateIdentifier": "rds-ca-default",
+            "DomainMemberships": [],
+            "CopyTagsToSnapshot": false,
+            "MonitoringInterval": 0,
+            "DBInstanceArn": "arn:aws:rds:us-east-1:123456789012:db:orders-db",
+            "IAMDatabaseAuthenticationEnabled": false,
+            "EnabledCloudwatchLogsExports": [],
+            "DeletionProtection": false,
+            "AssociatedRoles": [],
+            "TagList": []
+        },
+        {
+            "DBInstanceIdentifier": "users-db",
+            "DBInstanceClass": "db.t3.micro",
+            "Engine": "postgres",
+            "DBInstanceStatus": "available",
+            "MasterUsername": "sample_admin",
+            "Endpoint": {
+                "Address": "users-db.aaaaaaaaaa.us-east-1.rds.amazonaws.com",
+                "Port": 5432
+            },
+            "AllocatedStorage": 20,
+            "InstanceCreateTime": "2026-11-05T20:54:57.989074+00:00",
+            "PreferredBackupWindow": "13:14-13:44",
+            "BackupRetentionPeriod": 1,
+            "DBSecurityGroups": [],
+            "VpcSecurityGroups": [
+                {
+                    "VpcSecurityGroupId": "sg-a74466e099bfe0ee9",
+                    "Status": "active"
+                }
+            ],
+            "DBParameterGroups": [
+                {
+                    "DBParameterGroupName": "default.postgres9.3",
+                    "ParameterApplyStatus": "in-sync"
+                }
+            ],
+            "AvailabilityZone": "us-east-1a",
+            "PreferredMaintenanceWindow": "wed:06:38-wed:07:08",
+            "LatestRestorableTime": "2026-11-05T20:55:56.009712+00:00",
+            "MultiAZ": false,
+            "EngineVersion": "9.3.3",
+            "AutoMinorVersionUpgrade": true,
+            "ReadReplicaDBInstanceIdentifiers": [],
+            "LicenseModel": "general-public-license",
+            "OptionGroupMemberships": [
+                {
+                    "OptionGroupName": "default:postgres-9-3",
+                    "Status": "in-sync"
+                }
+            ],
+            "StorageType": "gp2",
+            "DbInstancePort": 5432,
+            "StorageEncrypted": false,
+            "DbiResourceId": "db-M5ENSHXFPU6XHZ4G4ZEI5QIO2U",
+            "CACertificateIdentifier": "rds-ca-default",
+            "DomainMemberships": [],
+            "CopyTagsToSnapshot": false,
+            "MonitoringInterval": 0,
+            "DBInstanceArn": "arn:aws:rds:us-east-1:123456789012:db:users-db",
+            "IAMDatabaseAuthenticationEnabled": false,
+            "EnabledCloudwatchLogsExports": [],
+            "DeletionProtection": false,
+            "AssociatedRoles": [],
+            "TagList": []
+        }
+    ],
+    "NextToken": "eyJNYXJrZXIiOiBudWxsLCAiYm90b190cnVuY2F0ZV9hbW91bnQiOiAyfQ=="
+}

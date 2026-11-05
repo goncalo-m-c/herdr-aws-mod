@@ -1,0 +1,12 @@
+{
+    "logGroups": [
+        {
+            "logGroupName": "/example/worker",
+            "creationTime": 1793912102029,
+            "metricFilterCount": 0,
+            "arn": "arn:aws:logs:us-east-1:123456789012:log-group:/example/worker:*",
+            "storedBytes": 0,
+            "logGroupArn": "arn:aws:logs:us-east-1:123456789012:log-group:/example/worker"
+        }
+    ]
+}

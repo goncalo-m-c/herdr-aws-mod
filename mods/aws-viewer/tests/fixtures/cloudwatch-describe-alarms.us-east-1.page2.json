@@ -1,0 +1,27 @@
+{
+    "MetricAlarms": [
+        {
+            "AlarmName": "disk-full",
+            "AlarmArn": "arn:aws:cloudwatch:us-east-1:123456789012:alarm:disk-full",
+            "AlarmConfigurationUpdatedTimestamp": "2026-11-05T20:55:00.454000+00:00",
+            "ActionsEnabled": true,
+            "OKActions": [],
+            "AlarmActions": [],
+            "InsufficientDataActions": [],
+            "StateValue": "OK",
+            "StateReason": "Unchecked: Initial alarm creation",
+            "StateReasonData": "{}",
+            "StateUpdatedTimestamp": "2026-11-05T20:55:00.454000+00:00",
+            "MetricName": "CPUUtilization",
+            "Namespace": "AWS/EC2",
+            "Statistic": "Average",
+            "Dimensions": [],
+            "Period": 300,
+            "EvaluationPeriods": 1,
+            "Threshold": 80.0,
+            "ComparisonOperator": "GreaterThanThreshold",
+            "Metrics": []
+        }
+    ],
+    "CompositeAlarms": []
+}

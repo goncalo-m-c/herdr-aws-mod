@@ -1,0 +1,45 @@
+{
+    "cluster": {
+        "name": "prod-cluster",
+        "arn": "arn:aws:eks:us-east-1:123456789012:cluster/prod-cluster",
+        "createdAt": "2026-11-05T20:54:55.494000+00:00",
+        "version": "1.19",
+        "endpoint": "https://I6sjGTxdKBr9ZZeSZJoO.TnE.us-east-1.eks.amazonaws.com/",
+        "roleArn": "arn:aws:iam::123456789012:role/eks-role",
+        "resourcesVpcConfig": {
+            "subnetIds": [
+                "subnet-12345678"
+            ]
+        },
+        "kubernetesNetworkConfig": {
+            "serviceIpv4Cidr": "172.20.0.0/16"
+        },
+        "logging": {
+            "clusterLogging": [
+                {
+                    "types": [
+                        "api",
+                        "audit",
+                        "authenticator",
+                        "controllerManager",
+                        "scheduler"
+                    ],
+                    "enabled": false
+                }
+            ]
+        },
+        "identity": {
+            "oidc": {
+                "issuer": "https://oidc.eks.us-east-1.amazonaws.com/id/juZmfihb9h"
+            }
+        },
+        "status": "ACTIVE",
+        "certificateAuthority": {
+            "data": "1NWYGf0bJoDM07LZj37wV27YcgvqVrEv7DoPzePtx8s5mDt5g5dxxpO8mSZvoIQf5vwmlP3QvsMQXe8ZnVduPMgaHXr649zVPQRfUsT8xFzgLNQzvuB5zF0kLZ6Lay3lES65096kMgm4iIaEzrJRaY09CQfh7qOeGrye52khdcHiW0dUMU9dDqvZyJsqa9BQotb5esHQhk0aBgJymkyJON3yZZgrlyMpAfWFcJUKbQNrMT2ObiKWG4xL0Y4prVrGhE00gtxlj8xvjJjVV7xr1IwP43QRNNBaFEDrOy7I52dJ8ywmhW93JS7DrHlHDdXsn2AChnUcPQN5LoXSdoF8j1AjF4OB3kXYQ5OQ8kpuWn4zKvNm2JLmGp2twotOrRMtPaPmyy9O5XO13ubGNFPHxadfxuwBxMaAA7imL0QwzjL4SB5GhUN7MParWrKZosOUTFZvcrA7lQuj0CYfQOtld8fQm530PHP6GRCLkX1adAyptSagoRJRsxHNNGJb1gRkOsGOXN9dDJ63K1UdZ09JeO5SP47vbz8ZoOIDEaPRa0pjYmEniUGg2pRgjyVqzXs953kJ4RALAwuQbzo2yskWYd43DxZWzrnibRUQsGY1miHFOdcoyxAZSJZAEsFu2K2I35h5cqghP61twE8dTaIyp5fKJs4aIKRkgn2UDHoxoxCP38mIiqGqWpNmYLFSUVNTAloAvz4MgJXzo6fXN0dzKg51OHcD6NL3SYhfHEpoDXc38m0PNbfonhPlhhbqqTQugyqloPi7iMdXGc6LRMehwS7psct7LiPPsovRGhWXY4mtCcJouWoFJH6DlZrlGhqi6mAYaOTfo6VVGX8HqJZsieeN5YZqfNbjKbizaLIzc5SDcqDPek4SwDh5uSmIsGUf3TtE3hGkB9JCdGM4JwWdNtMlp3zf2bavW4hd9N9Co3K4lTzFRhReCSOxFcynvHQqUGGeWD4WEfjTYaDDVKwcwgY5HDELHtlq7YRl2CmMuCi9Z4iHdP3BdWzTFYfGpJltCxxQBXca0lAvs7dowc6F8KAJrDi2rmnAdKrCBgM07xutmVgm4zC01ZS11MPlSYWXF9GBTDoZPg61NUiLFSFBILTlhtb7uKOyVx671h5FE1LvB8yPZXhbLhJfSJ8O1Al0Z7bVCTH3MtRWBhTvvsazHQnq9q8VB1USebUfKtIEVlkevNjOBdIokzdCZvDfv0YTbcaQfnl6aHJDWvZyNCgDvt9dshRAN4WUDhkhxTxYBAaT2RyLLHDRsXbQxiXfaX2H6n2J3783Pjn17yAsgubMvSoJrZ4GwsjhoEsCv10Bws3sP9KzZZmYbCmElhztxQED8YzvZruCxebB9SbijEt23i9kiVVTVqkDO1y2MAWwelCOVWXucxzSmKC4"
+        },
+        "clientRequestToken": "64ce2dbd-7417-4595-8cb6-f369420ffd31",
+        "platformVersion": "eks.4",
+        "tags": {},
+        "encryptionConfig": []
+    }
+}

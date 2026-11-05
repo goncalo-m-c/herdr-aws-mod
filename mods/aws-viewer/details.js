@@ -6,6 +6,19 @@ import { detailFields } from "./format.js";
 const NOTES = {
   object: "Metadata from the bucket listing. Object contents are never downloaded.",
   parameter: "Metadata from describe-parameters. Parameter values are never read or shown.",
+  secret: "Metadata from list-secrets. Secret values are never read or shown.",
+  "lambda-function": "Metadata from lambda list-functions. Function code is never downloaded.",
+  "ecr-image": "Metadata from ecr describe-images. Image contents are never pulled.",
+  "ec2-instance": "Metadata from ec2 describe-instances. User data, other tags and console output are never read.",
+  "efs-filesystem": "Metadata from efs describe-file-systems. File contents are never read.",
+  "eks-details": "Metadata from eks describe-cluster. Certificate data and credentials are never read.",
+  "rds-instance": "Metadata from rds describe-db-instances. Master usernames and passwords are never read or shown.",
+  "cw-alarm": "Metadata from cloudwatch describe-alarms. Metric data is never read.",
+  "cw-log-group": "Metadata from logs describe-log-groups. Log events are never read.",
+  "iam-user": "Metadata from iam list-users.",
+  "iam-role": "Metadata from iam list-roles.",
+  "iam-group": "Metadata from iam list-groups.",
+  "iam-policy": "Metadata from iam list-policies --scope Local.",
 };
 
 export function detailsPane(node, t) {

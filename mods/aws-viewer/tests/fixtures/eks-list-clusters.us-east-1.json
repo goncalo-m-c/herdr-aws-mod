@@ -1,0 +1,7 @@
+{
+    "clusters": [
+        "dev-cluster",
+        "prod-cluster",
+        "test-cluster"
+    ]
+}

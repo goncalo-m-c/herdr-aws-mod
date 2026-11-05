@@ -1,0 +1,23 @@
+{
+    "Parameters": [
+        {
+            "Name": "/app/dev/db/host",
+            "Type": "String",
+            "LastModifiedDate": "2026-11-05T20:55:05.307000+00:00",
+            "LastModifiedUser": "N/A",
+            "Version": 1,
+            "Tier": "Standard",
+            "DataType": "text"
+        },
+        {
+            "Name": "/app/dev/db/password",
+            "Type": "SecureString",
+            "KeyId": "alias/aws/ssm",
+            "LastModifiedDate": "2026-11-05T20:55:05.856000+00:00",
+            "LastModifiedUser": "N/A",
+            "Version": 1,
+            "Tier": "Standard",
+            "DataType": "text"
+        }
+    ]
+}

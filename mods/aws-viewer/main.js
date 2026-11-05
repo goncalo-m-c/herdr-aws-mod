@@ -6,6 +6,7 @@ import { props, theme } from "herdr";
 import { nameTabAfterProfile, shownViewerTabId } from "./tab-name.js";
 import { needsShellEnv, resolveTarget } from "./context.js";
 import { loginShellEnv } from "./env.js";
+import { regionList } from "./aws-args.js";
 import { runAws, profileRegion } from "./aws.js";
 import { SERVICES, isFolder, pageCommand, parsePage } from "./resources.js";
 import { createTree, toggle, startLoad, finishLoad, failLoad, refresh, select, visibleRows } from "./tree.js";
@@ -34,6 +35,7 @@ export default class AwsViewer extends View {
     this.tree = createTree(SERVICES);
     this.target = null;
     this.shownRegion = "";
+    this.regionsError = "";
     this.tabClaimUntil = Date.now() + TAB_CLAIM_MS;
     this.tabNamed = false;
     cx.spawn(async (cx) => {
@@ -41,11 +43,18 @@ export default class AwsViewer extends View {
       const shell = needsShellEnv(given) ? await loginShellEnv() : {};
       if (this.session !== session) return;
       this.target = resolveTarget(given, shell);
+      this.useRegions(given.regions);
       this.shownRegion = this.target.region;
       this.nameTab();
       cx.notify();
       if (!this.target.region) this.lookupRegion(session, cx);
     });
+  }
+
+  // The `regions` prop picks the tree's groups; a bad one shows an error and an empty tree.
+  useRegions(regions) {
+    try { this.tree = createTree(SERVICES, regionList(regions)); this.regionsError = ""; }
+    catch (e) { this.tree = createTree([]); this.regionsError = e.message; }
   }
 
   // Retried on render for a few seconds: Herdr may not list our pane yet when we start.
@@ -86,7 +95,7 @@ export default class AwsViewer extends View {
     cx.spawn(async (cx) => {
       try {
         if (!this.target) throw new Error("Still reading AWS_PROFILE. Refresh in a moment.");
-        const json = await runAws(pageCommand(node, ticket.token), this.target);
+        const json = await runAws(pageCommand(node, ticket.token), node.region ? { ...this.target, region: node.region } : this.target);
         if (this.session === session) finishLoad(tree, id, ticket, parsePage(node, json));
       } catch (e) {
         if (this.session === session) failLoad(tree, id, ticket, String(e?.message ?? e));
@@ -116,7 +125,9 @@ export default class AwsViewer extends View {
       .child(div().id("aws-profile").min_w(0).flex_shrink(1).truncate().text_size(12).text_color(profileColor)
         .tooltip(target?.profileSource === "props" ? "Profile from props" : "Profile from AWS_PROFILE (login shell)")
         .child(target ? `profile ${target.profile || "(none)"}` : "Reading AWS_PROFILE…"))
-      .child(div().flex_none().text_size(12).text_color(t.dim).child(target ? `region ${this.shownRegion || "(profile default)"}` : ""))
+      .child(this.regionsError
+        ? div().min_w(0).flex_shrink(1).truncate().text_size(12).text_color(t.ansi1).child(this.regionsError)
+        : div().flex_none().text_size(12).text_color(t.dim).child(target ? `region ${this.shownRegion || "(profile default)"}` : ""))
       .child(div().flex_1())
       .child(div().flex_none().text_size(11).text_color(t.dim).child("read-only"))
       .child(div().id("aws-reload").size(26).flex_none().flex().items_center().justify_center().rounded(6).cursor_pointer()

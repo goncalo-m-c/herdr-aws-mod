@@ -1,9 +1,0 @@
-{
-    "Buckets": [
-        { "Name": "my-bucket", "CreationDate": "2024-03-01T10:15:00+00:00", "BucketRegion": "eu-west-1" },
-        { "Name": "my-other-bucket", "CreationDate": "2023-11-20T08:00:00+00:00", "BucketRegion": "eu-west-1" }
-    ],
-    "Owner": { "DisplayName": "my-team", "ID": "abc123" },
-    "ContinuationToken": "my-other-bucket-token",
-    "Prefix": null
-}

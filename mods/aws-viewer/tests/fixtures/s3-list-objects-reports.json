@@ -1,0 +1,39 @@
+{
+    "IsTruncated": false,
+    "Contents": [
+        {
+            "Key": "reports/2024-05.csv",
+            "LastModified": "2026-11-05T20:54:37+00:00",
+            "ETag": "\"128507e329792a7afcf62fbb4c2c2296\"",
+            "ChecksumAlgorithm": [
+                "CRC64NVME"
+            ],
+            "Size": 14,
+            "StorageClass": "STANDARD"
+        },
+        {
+            "Key": "reports/2024-06.csv",
+            "LastModified": "2026-11-05T20:54:38+00:00",
+            "ETag": "\"128507e329792a7afcf62fbb4c2c2296\"",
+            "ChecksumAlgorithm": [
+                "CRC64NVME"
+            ],
+            "Size": 14,
+            "StorageClass": "STANDARD"
+        }
+    ],
+    "Name": "reports-bucket",
+    "Prefix": "reports/",
+    "Delimiter": "/",
+    "MaxKeys": 50,
+    "CommonPrefixes": [
+        {
+            "Prefix": "reports/archive/"
+        },
+        {
+            "Prefix": "reports/daily/"
+        }
+    ],
+    "EncodingType": "url",
+    "KeyCount": 4
+}

@@ -1,0 +1,46 @@
+{
+    "repositories": [
+        {
+            "repositoryArn": "arn:aws:ecr:eu-west-1:123456789012:repository/team/web",
+            "registryId": "123456789012",
+            "repositoryName": "team/web",
+            "repositoryUri": "123456789012.dkr.ecr.eu-west-1.amazonaws.com/team/web",
+            "createdAt": "2026-11-05T20:55:10.102000+00:00",
+            "imageTagMutability": "MUTABLE",
+            "imageScanningConfiguration": {
+                "scanOnPush": false
+            },
+            "encryptionConfiguration": {
+                "encryptionType": "AES256"
+            }
+        },
+        {
+            "repositoryArn": "arn:aws:ecr:eu-west-1:123456789012:repository/api",
+            "registryId": "123456789012",
+            "repositoryName": "api",
+            "repositoryUri": "123456789012.dkr.ecr.eu-west-1.amazonaws.com/api",
+            "createdAt": "2026-11-05T20:55:10.673000+00:00",
+            "imageTagMutability": "MUTABLE",
+            "imageScanningConfiguration": {
+                "scanOnPush": false
+            },
+            "encryptionConfiguration": {
+                "encryptionType": "AES256"
+            }
+        },
+        {
+            "repositoryArn": "arn:aws:ecr:eu-west-1:123456789012:repository/worker",
+            "registryId": "123456789012",
+            "repositoryName": "worker",
+            "repositoryUri": "123456789012.dkr.ecr.eu-west-1.amazonaws.com/worker",
+            "createdAt": "2026-11-05T20:55:11.218000+00:00",
+            "imageTagMutability": "MUTABLE",
+            "imageScanningConfiguration": {
+                "scanOnPush": false
+            },
+            "encryptionConfiguration": {
+                "encryptionType": "AES256"
+            }
+        }
+    ]
+}

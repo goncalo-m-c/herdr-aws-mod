@@ -1,0 +1,25 @@
+{
+    "Users": [
+        {
+            "Path": "/",
+            "UserName": "alice",
+            "UserId": "t1g7ylnfv4kosiaan9rn",
+            "Arn": "arn:aws:iam::123456789012:user/alice",
+            "CreateDate": "2026-11-05T20:54:30.247037+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "bob",
+            "UserId": "9faphb7exdt0hfzgoajj",
+            "Arn": "arn:aws:iam::123456789012:user/bob",
+            "CreateDate": "2026-11-05T20:54:30.799500+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "carol",
+            "UserId": "b2ufikw1id4erryjcyos",
+            "Arn": "arn:aws:iam::123456789012:user/carol",
+            "CreateDate": "2026-11-05T20:54:31.307502+00:00"
+        }
+    ]
+}

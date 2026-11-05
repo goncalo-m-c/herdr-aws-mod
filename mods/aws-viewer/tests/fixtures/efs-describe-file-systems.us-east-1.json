@@ -1,0 +1,74 @@
+{
+    "FileSystems": [
+        {
+            "OwnerId": "123456789012",
+            "CreationToken": "fs-1",
+            "FileSystemId": "fs-f0a53116",
+            "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:123456789012:file-system/fs-f0a53116",
+            "CreationTime": "2026-11-05T20:54:53.623505+00:00",
+            "LifeCycleState": "available",
+            "Name": "shared-data",
+            "NumberOfMountTargets": 0,
+            "SizeInBytes": {
+                "Value": 0,
+                "Timestamp": "2026-11-05T20:55:48.252120+00:00",
+                "ValueInIA": 0,
+                "ValueInStandard": 0
+            },
+            "PerformanceMode": "generalPurpose",
+            "Encrypted": false,
+            "ThroughputMode": "bursting",
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "shared-data"
+                }
+            ]
+        },
+        {
+            "OwnerId": "123456789012",
+            "CreationToken": "fs-2",
+            "FileSystemId": "fs-33b7c24d",
+            "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:123456789012:file-system/fs-33b7c24d",
+            "CreationTime": "2026-11-05T20:54:54.169689+00:00",
+            "LifeCycleState": "available",
+            "Name": "backups",
+            "NumberOfMountTargets": 0,
+            "SizeInBytes": {
+                "Value": 0,
+                "Timestamp": "2026-11-05T20:55:48.252146+00:00",
+                "ValueInIA": 0,
+                "ValueInStandard": 0
+            },
+            "PerformanceMode": "generalPurpose",
+            "Encrypted": false,
+            "ThroughputMode": "bursting",
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "backups"
+                }
+            ]
+        },
+        {
+            "OwnerId": "123456789012",
+            "CreationToken": "fs-3",
+            "FileSystemId": "fs-1f85ef0d",
+            "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:123456789012:file-system/fs-1f85ef0d",
+            "CreationTime": "2026-11-05T20:54:54.722010+00:00",
+            "LifeCycleState": "available",
+            "Name": "",
+            "NumberOfMountTargets": 0,
+            "SizeInBytes": {
+                "Value": 0,
+                "Timestamp": "2026-11-05T20:55:48.252165+00:00",
+                "ValueInIA": 0,
+                "ValueInStandard": 0
+            },
+            "PerformanceMode": "generalPurpose",
+            "Encrypted": false,
+            "ThroughputMode": "bursting",
+            "Tags": []
+        }
+    ]
+}
