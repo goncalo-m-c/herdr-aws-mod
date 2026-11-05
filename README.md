@@ -6,6 +6,26 @@ A read-only AWS viewer for [Herdr](https://herdr.dev). It shows S3 buckets, IAM 
 
 See [RECIPE.md](RECIPE.md) for the full brief. The mod lives in `mods/aws-viewer/`.
 
+## Supported services
+
+Services marked global show once. Regional services show one group per region (see the `regions` prop).
+
+| Service | Scope | What you can browse | Read-only command(s) |
+|---|---|---|---|
+| S3 | global | buckets, then prefixes and objects | `s3api list-buckets`, `s3api list-objects-v2` |
+| IAM | global | users, roles, groups, local policies | `iam list-users`, `iam list-roles`, `iam list-groups`, `iam list-policies` |
+| Secrets Manager | regional | secrets | `secretsmanager list-secrets` |
+| Lambda | regional | functions | `lambda list-functions` |
+| ECR | regional | repositories and their images | `ecr describe-repositories`, `ecr describe-images` |
+| EC2 | regional | instances | `ec2 describe-instances` |
+| EFS | regional | file systems | `efs describe-file-systems` |
+| EKS | regional | clusters and one details row | `eks list-clusters`, `eks describe-cluster` |
+| RDS | regional | DB instances | `rds describe-db-instances` |
+| CloudWatch | regional | alarms and log groups | `cloudwatch describe-alarms`, `logs describe-log-groups` |
+| SSM Parameter Store | regional | parameters, with folders from their names | `ssm describe-parameters` |
+
+Values are never read: no secret values (Secrets Manager, SSM), no EC2 user data or console output, no Lambda code, no ECR image contents, no S3 object contents.
+
 ## Install
 
 Copy the mod folder into Herdr's mods directory:
