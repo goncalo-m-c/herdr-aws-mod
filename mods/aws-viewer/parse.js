@@ -177,6 +177,18 @@ export function dbInstancesPage(json) {
   return { items, nextToken: json?.NextToken ?? null };
 }
 
+/** cloudwatch describe-alarms: metric alarms only (composite alarms have no metric or threshold). */
+export function alarmsPage(json) {
+  const items = (json?.MetricAlarms ?? []).map((a) => ({
+    id: `cwa:${a.AlarmName}`, kind: "cw-alarm", label: a.AlarmName, name: a.AlarmName,
+    meta: {
+      state: a.StateValue ?? null, metric: a.MetricName ?? null, namespace: a.Namespace ?? null,
+      threshold: a.Threshold ?? null, stateUpdated: a.StateUpdatedTimestamp ?? null,
+    },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
 /** secretsmanager list-secrets: metadata only, never the secret value. */
 export function secretsPage(json) {
   const items = (json?.SecretList ?? []).map((s) => ({

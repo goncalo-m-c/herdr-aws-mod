@@ -1,0 +1,24 @@
+{
+  "MetricAlarms": [
+    {
+      "AlarmName": "high-cpu",
+      "AlarmArn": "arn:aws:cloudwatch:eu-west-1:123456789012:alarm:high-cpu",
+      "StateValue": "ALARM",
+      "StateReason": "Threshold Crossed",
+      "MetricName": "CPUUtilization",
+      "Namespace": "AWS/EC2",
+      "Threshold": 80.0,
+      "ComparisonOperator": "GreaterThanThreshold",
+      "StateUpdatedTimestamp": "2024-06-01T10:15:00.000000+00:00"
+    },
+    {
+      "AlarmName": "queue-depth",
+      "StateValue": "OK",
+      "MetricName": "ApproximateNumberOfMessagesVisible",
+      "Namespace": "AWS/SQS",
+      "Threshold": 1000.0,
+      "StateUpdatedTimestamp": "2024-05-20T07:00:00.000000+00:00"
+    }
+  ],
+  "NextToken": "example-alarms-token"
+}

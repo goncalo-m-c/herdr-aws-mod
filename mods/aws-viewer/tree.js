@@ -7,21 +7,24 @@ export function createTree(services, regions = []) {
   const tree = { nodes: new Map(), roots: [], selected: null };
   for (const spec of services) {
     tree.roots.push(spec.id);
-    if (spec.folders) { addFixedFolders(tree, spec); continue; }
+    if (spec.folders && !(spec.regional && regions.length)) { addFixedFolders(tree, spec); continue; }
     if (!spec.regional || !regions.length) { tree.nodes.set(spec.id, makeNode(spec)); continue; }
-    const groups = regions.map((region) => makeNode({ ...spec, id: `${spec.id}@${region}`, label: region, region }));
-    for (const group of groups) tree.nodes.set(group.id, group);
+    const groups = regions.map((region) => ({ ...spec, id: `${spec.id}@${region}`, label: region, region }));
+    for (const group of groups) {
+      if (group.folders) addFixedFolders(tree, group); // a region group with fixed folders (CloudWatch)
+      else tree.nodes.set(group.id, makeNode(group));
+    }
     tree.nodes.set(spec.id, { ...makeNode({ id: spec.id, kind: "regions", label: spec.label }), loaded: true, children: groups.map((g) => g.id) });
   }
   return tree;
 }
 
-// A global service with fixed folders: the root is already loaded, each folder loads its own list.
+// A service (or one region group) with fixed folders: the root is already loaded, each folder loads its own list.
 function addFixedFolders(tree, spec) {
   const { folders, ...root } = spec;
-  const children = folders.map((folder) => makeNode({ ...folder, id: `${spec.id}:${folder.kind}` }));
+  const children = folders.map((folder) => makeNode({ ...folder, id: `${spec.id}:${folder.kind}`, ...(spec.region ? { region: spec.region } : {}) }));
   for (const child of children) tree.nodes.set(child.id, child);
-  tree.nodes.set(spec.id, { ...makeNode(root), loaded: true, children: children.map((c) => c.id) });
+  tree.nodes.set(spec.id, { ...makeNode(root), group: true, loaded: true, children: children.map((c) => c.id) });
 }
 
 /** Opens or closes a folder; returns true when it now needs its first page. */

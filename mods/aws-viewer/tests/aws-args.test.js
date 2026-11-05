@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, describeFileSystems, listClusters, describeCluster, describeDbInstances, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
+import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, describeFileSystems, listClusters, describeCluster, describeDbInstances, describeAlarms, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
 
 const DEV = { profile: "dev", region: "eu-west-1" };
 
@@ -179,6 +179,18 @@ test("RDS describe-db-instances is allowed, CLI-paged, and writes are refused", 
   assert.ok(describeDbInstances("t").includes("--starting-token=t"));
   assert.ok(!describeDbInstances("t").includes("--no-paginate"));
   for (const command of [["rds", "delete-db-instance", "--db-instance-identifier=x"], ["rds", "create-db-instance"], ["rds", "modify-db-instance"], ["rds", "generate-db-auth-token"], ["rds", "describe-db-snapshots"]]) {
+    assert.equal(isReadOnly(command), false, command.join(" "));
+    assert.throws(() => invocation(command, DEV), Refusal, command.join(" "));
+  }
+});
+
+test("CloudWatch describe-alarms is allowed, CLI-paged, and metric reads and writes are refused", () => {
+  assert.deepEqual(invocation(describeAlarms(null), DEV), [
+    "cloudwatch", "describe-alarms", `--max-items=${PAGE_SIZE}`, "--profile=dev", "--region=eu-west-1", "--output=json", "--no-cli-pager", "--no-cli-auto-prompt",
+  ]);
+  assert.ok(describeAlarms("t").includes("--starting-token=t"));
+  assert.ok(!describeAlarms("t").includes("--no-paginate"));
+  for (const command of [["cloudwatch", "get-metric-data"], ["cloudwatch", "put-metric-alarm"], ["cloudwatch", "delete-alarms"], ["cloudwatch", "describe-alarm-history"]]) {
     assert.equal(isReadOnly(command), false, command.join(" "));
     assert.throws(() => invocation(command, DEV), Refusal, command.join(" "));
   }

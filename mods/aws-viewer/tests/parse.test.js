@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage, fileSystemsPage, clustersPage, clusterDetailsPage, dbInstancesPage } from "../parse.js";
+import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage, fileSystemsPage, clustersPage, clusterDetailsPage, dbInstancesPage, alarmsPage } from "../parse.js";
 
 const fixture = (name) => JSON.parse(readFileSync(new URL(`./fixtures/${name}.json`, import.meta.url), "utf8"));
 
@@ -135,4 +135,12 @@ test("RDS instances page: engine, version, class, status, endpoint; never the ma
   assert.ok(!JSON.stringify(page).includes("example_admin"));
   assert.equal(page.nextToken, "example-dbinstances-token");
   assert.deepEqual(dbInstancesPage({}).items, []);
+});
+
+test("CloudWatch alarms page: state, metric, namespace, threshold, last update", () => {
+  const page = alarmsPage(fixture("cloudwatch-describe-alarms"));
+  assert.deepEqual(page.items.map((i) => [i.kind, i.label]), [["cw-alarm", "high-cpu"], ["cw-alarm", "queue-depth"]]);
+  assert.deepEqual(page.items[0].meta, { state: "ALARM", metric: "CPUUtilization", namespace: "AWS/EC2", threshold: 80, stateUpdated: "2024-06-01T10:15:00.000000+00:00" });
+  assert.equal(page.nextToken, "example-alarms-token");
+  assert.deepEqual(alarmsPage({}).items, []);
 });

@@ -1,7 +1,7 @@
 // Which aws call loads a folder node's next page, and which parser reads it.
 // Pure, so node --test covers it.
-import { listBuckets, listObjects, describeParameters, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, describeFileSystems, listClusters, describeCluster, describeDbInstances } from "./aws-args.js";
-import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage, fileSystemsPage, clustersPage, clusterDetailsPage, dbInstancesPage } from "./parse.js";
+import { listBuckets, listObjects, describeParameters, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, describeFileSystems, listClusters, describeCluster, describeDbInstances, describeAlarms } from "./aws-args.js";
+import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage, fileSystemsPage, clustersPage, clusterDetailsPage, dbInstancesPage, alarmsPage } from "./parse.js";
 
 // `regional: true` services get one group per listed region; the rest (global, like S3) show once.
 export const SERVICES = [
@@ -18,6 +18,10 @@ export const SERVICES = [
   { id: "efs", kind: "efs", label: "EFS", regional: true },
   { id: "eks", kind: "eks", label: "EKS", regional: true },
   { id: "rds", kind: "rds", label: "RDS", regional: true },
+  // CloudWatch is regional with fixed folders: each region group holds Alarms and Log groups.
+  { id: "cloudwatch", kind: "cloudwatch", label: "CloudWatch", regional: true, folders: [
+    { kind: "cw-alarms", label: "Alarms" },
+  ] },
   { id: "ssm", kind: "ssm", label: "SSM Parameter Store", path: "", regional: true },
 ];
 
@@ -38,6 +42,7 @@ const LOADERS = {
   eks: { command: (_node, token) => listClusters(token), parse: (_node, json) => clustersPage(json) },
   "eks-cluster": { command: (node) => describeCluster(node.cluster), parse: (node, json) => clusterDetailsPage(json, node.cluster) },
   rds: { command: (_node, token) => describeDbInstances(token), parse: (_node, json) => dbInstancesPage(json) },
+  "cw-alarms": { command: (_node, token) => describeAlarms(token), parse: (_node, json) => alarmsPage(json) },
   ssm: { command: (node, token) => describeParameters(node.path, token), parse: (node, json) => parametersPage(json, node.path) },
   "ssm-path": { command: (node, token) => describeParameters(node.path, token), parse: (node, json) => parametersPage(json, node.path) },
 };
@@ -46,9 +51,9 @@ export function isFolder(node) {
   return Boolean(node && (LOADERS[node.kind] || isGroupNode(node)));
 }
 
-/** Folders that only hold other folders and make no aws call: region groups and the IAM root. */
+/** Folders that only hold other folders and make no aws call: region groups and roots with fixed folders (IAM, CloudWatch). */
 export function isGroupNode(node) {
-  return node?.kind === "regions" || node?.kind === "iam";
+  return node?.kind === "regions" || node?.kind === "iam" || Boolean(node?.group);
 }
 
 /** The aws command (without --profile/--region) for one page; `token` null = first page. */

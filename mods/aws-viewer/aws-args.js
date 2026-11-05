@@ -3,7 +3,7 @@
 
 export const PAGE_SIZE = 50;
 
-const READ_ONLY_COMMANDS = new Set(["s3api list-buckets", "s3api list-objects-v2", "ssm describe-parameters", "iam list-users", "iam list-roles", "iam list-groups", "iam list-policies", "secretsmanager list-secrets", "lambda list-functions", "ecr describe-repositories", "ecr describe-images", "ec2 describe-instances", "efs describe-file-systems", "eks list-clusters", "eks describe-cluster", "rds describe-db-instances", "configure get"]);
+const READ_ONLY_COMMANDS = new Set(["s3api list-buckets", "s3api list-objects-v2", "ssm describe-parameters", "iam list-users", "iam list-roles", "iam list-groups", "iam list-policies", "secretsmanager list-secrets", "lambda list-functions", "ecr describe-repositories", "ecr describe-images", "ec2 describe-instances", "efs describe-file-systems", "eks list-clusters", "eks describe-cluster", "rds describe-db-instances", "cloudwatch describe-alarms", "logs describe-log-groups", "configure get"]);
 const REGION = /^[a-z]{2}(-[a-z]+)+-\d+$/;
 // The CLI reads file:// (and similar) values from disk; a resource name must never do that.
 const URL_LIKE = /^[a-z][a-z0-9+.-]*:\/\//i;
@@ -79,6 +79,11 @@ export function describeCluster(name) {
 /** RDS is paged by the CLI like IAM: --max-items and --starting-token (no --no-paginate). */
 export function describeDbInstances(token) {
   return ["rds", "describe-db-instances", `--max-items=${PAGE_SIZE}`, ...tokenArg("--starting-token", token)];
+}
+
+/** CloudWatch alarms are paged by the CLI like IAM: --max-items and --starting-token (no --no-paginate). Metric alarms only. */
+export function describeAlarms(token) {
+  return ["cloudwatch", "describe-alarms", `--max-items=${PAGE_SIZE}`, ...tokenArg("--starting-token", token)];
 }
 
 /** The `regions` prop as a list of valid region names; throws Refusal on a bad one. Missing means []. */

@@ -88,3 +88,8 @@ test("RDS details show identifier, engine, version, class, status and endpoint",
   assert.deepEqual(fields, [["Identifier", "orders-db"], ["Engine", "postgres"], ["Version", "16.3"], ["Class", "db.t3.micro"], ["Status", "available"], ["Endpoint", "orders-db.EXAMPLE.rds.amazonaws.com:5432"]]);
   assert.ok(!fields.some(([label]) => /user|password/i.test(label)));
 });
+
+test("CloudWatch alarm details show name, state, metric, namespace, threshold and last update", () => {
+  const fields = detailFields({ kind: "cw-alarm", name: "high-cpu", meta: { state: "ALARM", metric: "CPUUtilization", namespace: "AWS/EC2", threshold: 80, stateUpdated: "2024-06-01T10:15:00.000000+00:00" } });
+  assert.deepEqual(fields, [["Name", "high-cpu"], ["State", "ALARM"], ["Metric", "CPUUtilization"], ["Namespace", "AWS/EC2"], ["Threshold", 80], ["Last state update", "2024-06-01 10:15 UTC"]]);
+});

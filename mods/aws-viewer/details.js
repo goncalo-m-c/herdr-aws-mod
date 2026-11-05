@@ -13,6 +13,7 @@ const NOTES = {
   "efs-filesystem": "Metadata from efs describe-file-systems. File contents are never read.",
   "eks-details": "Metadata from eks describe-cluster. Certificate data and credentials are never read.",
   "rds-instance": "Metadata from rds describe-db-instances. Master usernames and passwords are never read or shown.",
+  "cw-alarm": "Metadata from cloudwatch describe-alarms. Metric data is never read.",
   "iam-user": "Metadata from iam list-users.",
   "iam-role": "Metadata from iam list-roles.",
   "iam-group": "Metadata from iam list-groups.",
