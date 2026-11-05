@@ -30,7 +30,7 @@ Example: `--props '{"profile": "dev", "region": "eu-west-1"}'`.
 Several regions: `--props '{"profile": "dev", "regions": ["us-east-1", "eu-west-1"]}'`.
 An invalid region name is refused and nothing is shown. Without `regions`, the viewer uses one region as before.
 Without props, the mod reads `AWS_PROFILE`, then `AWS_REGION` or `AWS_DEFAULT_REGION`, from your login shell.
-The tab is renamed to the profile name, unless you named it yourself.
+The tab is renamed to `☁ <profile>`, unless you named it yourself.
 
 ## Read-only
 
