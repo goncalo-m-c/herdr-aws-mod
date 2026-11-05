@@ -165,6 +165,18 @@ export function clusterDetailsPage(json, cluster) {
   };
 }
 
+/** rds describe-db-instances: connection facts only; the master username is never kept. */
+export function dbInstancesPage(json) {
+  const items = (json?.DBInstances ?? []).map((d) => ({
+    id: `rds:${d.DBInstanceIdentifier}`, kind: "rds-instance", label: d.DBInstanceIdentifier, name: d.DBInstanceIdentifier,
+    meta: {
+      engine: d.Engine ?? null, version: d.EngineVersion ?? null, class: d.DBInstanceClass ?? null, status: d.DBInstanceStatus ?? null,
+      endpoint: d.Endpoint?.Address ? `${d.Endpoint.Address}${d.Endpoint.Port ? `:${d.Endpoint.Port}` : ""}` : null,
+    },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
 /** secretsmanager list-secrets: metadata only, never the secret value. */
 export function secretsPage(json) {
   const items = (json?.SecretList ?? []).map((s) => ({

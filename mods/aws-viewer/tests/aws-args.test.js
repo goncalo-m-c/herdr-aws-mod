@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, describeFileSystems, listClusters, describeCluster, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
+import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, describeFileSystems, listClusters, describeCluster, describeDbInstances, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
 
 const DEV = { profile: "dev", region: "eu-west-1" };
 
@@ -167,6 +167,18 @@ test("EKS list-clusters and describe-cluster are allowed, and writes are refused
   assert.ok(isReadOnly(describeCluster("prod-cluster")));
   assert.throws(() => describeCluster("file://etc/passwd"), Refusal);
   for (const command of [["eks", "create-cluster", "--name=x"], ["eks", "delete-cluster", "--name=x"], ["eks", "update-cluster-config"], ["eks", "get-token", "--cluster-name=x"], ["eks", "update-kubeconfig"]]) {
+    assert.equal(isReadOnly(command), false, command.join(" "));
+    assert.throws(() => invocation(command, DEV), Refusal, command.join(" "));
+  }
+});
+
+test("RDS describe-db-instances is allowed, CLI-paged, and writes are refused", () => {
+  assert.deepEqual(invocation(describeDbInstances(null), DEV), [
+    "rds", "describe-db-instances", `--max-items=${PAGE_SIZE}`, "--profile=dev", "--region=eu-west-1", "--output=json", "--no-cli-pager", "--no-cli-auto-prompt",
+  ]);
+  assert.ok(describeDbInstances("t").includes("--starting-token=t"));
+  assert.ok(!describeDbInstances("t").includes("--no-paginate"));
+  for (const command of [["rds", "delete-db-instance", "--db-instance-identifier=x"], ["rds", "create-db-instance"], ["rds", "modify-db-instance"], ["rds", "generate-db-auth-token"], ["rds", "describe-db-snapshots"]]) {
     assert.equal(isReadOnly(command), false, command.join(" "));
     assert.throws(() => invocation(command, DEV), Refusal, command.join(" "));
   }

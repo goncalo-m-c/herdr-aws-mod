@@ -82,3 +82,9 @@ test("EKS details show version, status, endpoint and created date", () => {
   const fields = detailFields({ kind: "eks-details", name: "prod-cluster", meta: { version: "1.30", status: "ACTIVE", endpoint: "https://EXAMPLE.eks.amazonaws.com", created: "2024-05-01T08:30:00.000000+00:00" } });
   assert.deepEqual(fields, [["Cluster", "prod-cluster"], ["Version", "1.30"], ["Status", "ACTIVE"], ["Endpoint", "https://EXAMPLE.eks.amazonaws.com"], ["Created", "2024-05-01 08:30 UTC"]]);
 });
+
+test("RDS details show identifier, engine, version, class, status and endpoint", () => {
+  const fields = detailFields({ kind: "rds-instance", name: "orders-db", meta: { engine: "postgres", version: "16.3", class: "db.t3.micro", status: "available", endpoint: "orders-db.EXAMPLE.rds.amazonaws.com:5432" } });
+  assert.deepEqual(fields, [["Identifier", "orders-db"], ["Engine", "postgres"], ["Version", "16.3"], ["Class", "db.t3.micro"], ["Status", "available"], ["Endpoint", "orders-db.EXAMPLE.rds.amazonaws.com:5432"]]);
+  assert.ok(!fields.some(([label]) => /user|password/i.test(label)));
+});

@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage, fileSystemsPage, clustersPage, clusterDetailsPage } from "../parse.js";
+import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage, fileSystemsPage, clustersPage, clusterDetailsPage, dbInstancesPage } from "../parse.js";
 
 const fixture = (name) => JSON.parse(readFileSync(new URL(`./fixtures/${name}.json`, import.meta.url), "utf8"));
 
@@ -125,4 +125,14 @@ test("EKS cluster details page: one leaf with version, status, endpoint, created
   assert.ok(!JSON.stringify(page).includes("EXAMPLE-NOT-SHOWN"));
   assert.equal(page.nextToken, null);
   assert.deepEqual(clusterDetailsPage({}, "x").items, []);
+});
+
+test("RDS instances page: engine, version, class, status, endpoint; never the master username", () => {
+  const page = dbInstancesPage(fixture("rds-describe-db-instances"));
+  assert.deepEqual(page.items.map((i) => [i.kind, i.label]), [["rds-instance", "orders-db"], ["rds-instance", "new-db"]]);
+  assert.deepEqual(page.items[0].meta, { engine: "postgres", version: "16.3", class: "db.t3.micro", status: "available", endpoint: "orders-db.EXAMPLE.eu-west-1.rds.amazonaws.com:5432" });
+  assert.equal(page.items[1].meta.endpoint, null);
+  assert.ok(!JSON.stringify(page).includes("example_admin"));
+  assert.equal(page.nextToken, "example-dbinstances-token");
+  assert.deepEqual(dbInstancesPage({}).items, []);
 });
