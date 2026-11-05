@@ -18,7 +18,7 @@ const LOADERS = {
 };
 
 export function isFolder(node) {
-  return Boolean(node && LOADERS[node.kind]);
+  return Boolean(node && (LOADERS[node.kind] || node.kind === "regions"));
 }
 
 /** The aws command (without --profile/--region) for one page; `token` null = first page. */

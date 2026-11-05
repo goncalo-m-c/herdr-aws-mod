@@ -2,9 +2,16 @@
 // Pure, so node --test covers it. A "ticket" ties a load to the request that started it.
 import { isFolder } from "./resources.js";
 
-export function createTree(services) {
+/** `regions` (optional): regional services get a "regions" node with one group per region. */
+export function createTree(services, regions = []) {
   const tree = { nodes: new Map(), roots: [], selected: null };
-  for (const spec of services) { tree.nodes.set(spec.id, makeNode(spec)); tree.roots.push(spec.id); }
+  for (const spec of services) {
+    tree.roots.push(spec.id);
+    if (!spec.regional || !regions.length) { tree.nodes.set(spec.id, makeNode(spec)); continue; }
+    const groups = regions.map((region) => makeNode({ ...spec, id: `${spec.id}@${region}`, label: region, region }));
+    for (const group of groups) tree.nodes.set(group.id, group);
+    tree.nodes.set(spec.id, { ...makeNode({ id: spec.id, kind: "regions", label: spec.label }), loaded: true, children: groups.map((g) => g.id) });
+  }
   return tree;
 }
 
@@ -31,7 +38,8 @@ export function finishLoad(tree, id, ticket, page) {
   const node = current(tree, id, ticket);
   if (!node) return false;
   if (!ticket.more) dropChildren(tree, node);
-  for (const item of page.items) {
+  for (const raw of page.items) {
+    const item = node.region ? { ...raw, id: `${raw.id}@${node.region}`, region: node.region } : raw; // same name, other region: own node
     if (!tree.nodes.has(item.id)) tree.nodes.set(item.id, makeNode(item));
     if (!node.children.includes(item.id)) node.children.push(item.id);
   }
@@ -50,7 +58,7 @@ export function failLoad(tree, id, ticket, message) {
 /** Forgets a folder's pages and opens it; any load in flight for it becomes stale. */
 export function refresh(tree, id) {
   const node = tree.nodes.get(id);
-  if (!node || !isFolder(node)) return false;
+  if (!node || !isFolder(node) || node.kind === "regions") return false;
   dropChildren(tree, node);
   Object.assign(node, { open: true, loaded: false, loading: false, error: null, nextToken: null, request: node.request + 1 });
   return true;

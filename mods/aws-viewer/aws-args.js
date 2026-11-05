@@ -26,6 +26,15 @@ export function describeParameters(path, token) {
   return ["ssm", "describe-parameters", "--no-paginate", ...filters, `--max-results=${PAGE_SIZE}`, ...tokenArg("--next-token", token)];
 }
 
+/** The `regions` prop as a list of valid region names; throws Refusal on a bad one. Missing means []. */
+export function regionList(value) {
+  if (value == null) return [];
+  const list = Array.isArray(value) ? value.map((r) => String(r).trim()) : [];
+  const bad = Array.isArray(value) ? list.find((r) => !REGION.test(r)) : String(value);
+  if (bad !== undefined) throw new Refusal(`Refused: "${bad}" is not a valid AWS region name.`);
+  return [...new Set(list)];
+}
+
 /** Local only: reads the profile's region from ~/.aws/config. */
 export function configuredRegion() {
   return ["configure", "get", "region"];
