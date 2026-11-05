@@ -1,5 +1,6 @@
-// Names the viewer's own tab after the AWS profile, unless someone named it by hand.
+// Names the viewer's own tab after the AWS profile ("☁ <profile>"), unless someone named it by hand.
 import { spaces, panes, run } from "herdr";
+import { autoTabName } from "./format.js";
 
 /** The tab being shown that holds an aws-viewer pane: a mod starts when first shown, so it is ours. */
 export function shownViewerTabId() {
@@ -12,7 +13,8 @@ export function shownViewerTabId() {
 export function nameTabAfterProfile(tabId, profile, lastAutoName) {
   const tab = spaces().flatMap((space) => space.tabs).find((candidate) => candidate.id === tabId);
   const namedByHand = tab?.named && tab.name !== lastAutoName;
-  if (!tab || !profile || namedByHand || tab.name === profile) return lastAutoName;
-  run("tab.rename", { id: tabId, name: profile });
-  return profile;
+  const name = autoTabName(profile);
+  if (!tab || !profile || namedByHand || tab.name === name) return lastAutoName;
+  run("tab.rename", { id: tabId, name });
+  return name;
 }

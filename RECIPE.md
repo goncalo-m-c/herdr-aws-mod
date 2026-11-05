@@ -8,6 +8,8 @@ A read-only browser for your AWS account, in a Herdr tab. A header shows the pro
 
 The mod is one pane, 900 by 600 at first, in the theme's background and foreground colors. Text is 13px.
 
+`preview.png` shows the final build: the header with the profile, the region and the `read-only` label, the tree with S3 and EC2 expanded (EC2 is grouped per region), and the details pane for one EC2 instance.
+
 - **Header, 42px high**, with a bottom border. Left to right:
   - A neutral cloud icon (`cloud.svg`, 20px, muted color).
   - `profile <name>` in 12px, `ansi2` green. Before the profile is read it shows `Reading AWS_PROFILE…` in the dim color. With no profile it shows `profile (none)`. The tooltip says whether the profile came from props or from `AWS_PROFILE` (login shell).
@@ -64,7 +66,7 @@ The mod is one pane, 900 by 600 at first, in the theme's background and foregrou
 - **Hover.** Rows and buttons get the theme's hover background. Long names show a tooltip with the full name, such as `s3://my-bucket/reports/`.
 - **Errors** show inline in the tree, as short messages: expired login, no credentials, unknown profile, failing credential helper, access denied, missing bucket, no network, missing AWS CLI. Other failures show the first line of the CLI error, cut at 240 characters.
 - **Bad `regions`.** If `regions` is not a list, or any name does not look like `xx-name-N`, the header shows `Refused: "<value>" is not a valid AWS region name.` in red and the tree is empty. No `aws` call runs.
-- **Tab name.** For about 5 seconds after start, the mod renames its own tab to the profile name. It does nothing if you named the tab yourself.
+- **Tab name.** For about 5 seconds after start, the mod renames its own tab to `☁ <profile>`. It does nothing if you named the tab yourself.
 - **No profile guard.** The mod uses whatever profile it is given, with no check or block on its name.
 - There are no agent statuses. The mod does not look at agents.
 
@@ -92,7 +94,7 @@ The mod makes no network call of its own. Network access happens only inside the
 - `rows.js`: draws tree rows, hint rows and the `Load more…` row.
 - `details.js` and `format.js`: the details pane and its text formatting.
 - `errors.js`: short messages for failed `aws` calls and for a missing `aws` program.
-- `tab-name.js`: renames the viewer's tab with `run("tab.rename", { id, name })`.
+- `tab-name.js`: renames the viewer's tab with `run("tab.rename", { id, name })`. The name comes from `autoTabName` in `format.js`, which puts the glyph constant `TAB_GLYPH` (U+2601, then one space) before the profile.
 - `tests/`: `aws-args.test.js`, `parse.test.js`, `tree.test.js`, `misc.test.js`, and fake JSON in `tests/fixtures/`.
 - Art, 24px stroke icons tinted with `text_color`: `cloud.svg`, `bucket.svg`, `folder.svg`, `file.svg`, `key.svg`, `chevron-right.svg`, `chevron-down.svg`, `refresh.svg`, `spinner.svg`.
 
@@ -126,7 +128,6 @@ Response fields read, per command: `Buckets[].Name/CreationDate/BucketRegion` an
 ## Watch out
 
 - **Not verified live.** The AWS response shapes above came from the AWS CLI documentation, not from live calls. The UI was not run in Herdr in the build agent's environment. Only the pure modules are tested, with fake fixtures. A fresh build must run it once against a real account.
-- **`preview.png` shows the earlier view** (S3 and SSM only). It should be retaken.
 - The viewer blocks any argument that contains `decryption`, and any resource name that looks like a URL such as `file://`.
 - The environment lookup uses a login shell (`$SHELL -lc`). `zsh -l` does not read `.zshrc`. Set `AWS_PROFILE` in `.zshenv` or `.zprofile`, or pass `profile` as a prop.
 - Do not add `--no-paginate` to calls that use `--max-items`. The CLI rejects the pair. For S3, `--max-items` counts only `Contents`, so on a prefix-only level it could walk every page. That is why S3 uses `--no-paginate` with the native size and token.
@@ -137,6 +138,7 @@ Response fields read, per command: `Buckets[].Name/CreationDate/BucketRegion` an
 - With `regions`, node ids get an `@<region>` suffix. Keep that, or the same name in two regions will collide.
 - It needs AWS CLI v2 on the login `PATH`. It does not support remote machines. It has no search and no keyboard navigation.
 - The tab rename retries on render for about 5 seconds, because Herdr may not list the pane at start.
+- The tab glyph is plain text, so its look depends on Herdr's font. A mod cannot set the tab pill icon: the tab bar reads the pane's program.
 - Do not ship an AWS logo. The header uses the neutral cloud icon.
 
 ## Done when
@@ -147,5 +149,5 @@ Response fields read, per command: `Buckets[].Name/CreationDate/BucketRegion` an
 - With `--props '{"profile":"dev","regions":["us-east-1","eu-west-1"]}'`, S3 and IAM appear once, and Lambda shows `us-east-1` and `eu-west-1`. Opening a group runs `aws lambda list-functions` with that group's `--region`.
 - With `--props '{"regions":["nope"]}'`, the header shows the red `Refused` line, the tree is empty and no `aws` command runs.
 - Selecting a leaf shows the details pane and runs no command.
-- The tab is renamed to the profile name.
+- The tab is renamed to `☁ <profile>`.
 - `docker run --rm --network none -v "$PWD/mods/aws-viewer:/w:ro" -w /w node:22-slim node --test "tests/*.test.js"` passes.

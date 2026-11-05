@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import { describeAwsError, describeExecFailure } from "../errors.js";
 import { parseShellEnv, resolveTarget, needsShellEnv, ENV_MARKER } from "../context.js";
-import { detailFields, formatSize, formatDate } from "../format.js";
+import { detailFields, formatSize, formatDate, autoTabName } from "../format.js";
 
 test("aws errors become short messages", () => {
   assert.match(describeAwsError("Error when retrieving token from sso: Token has expired and refresh failed", "dev"), /expired/);
@@ -98,4 +98,10 @@ test("CloudWatch log group details show name, stored bytes, retention and create
   const fields = detailFields({ kind: "cw-log-group", name: "/example/app", meta: { storedBytes: 2048, retentionDays: 14, created: "2024-04-01T00:00:00.000Z" } });
   assert.deepEqual(fields, [["Name", "/example/app"], ["Stored", "2 KB (2,048 bytes)"], ["Retention", "14 days"], ["Created", "2024-04-01 00:00 UTC"]]);
   assert.equal(detailFields({ kind: "cw-log-group", name: "x", meta: {} })[2][1], "Never expire");
+});
+
+test("autoTabName puts a plain cloud glyph and one space before the profile", () => {
+  assert.equal(autoTabName("dev"), "\u2601 dev");
+  assert.equal(autoTabName("dev").codePointAt(0), 0x2601);
+  assert.ok(!autoTabName("dev").includes("\uFE0F"));
 });

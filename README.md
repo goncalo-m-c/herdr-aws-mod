@@ -6,6 +6,26 @@ A read-only AWS viewer for [Herdr](https://herdr.dev). It shows S3 buckets, IAM 
 
 See [RECIPE.md](RECIPE.md) for the full brief. The mod lives in `mods/aws-viewer/`.
 
+## Supported services
+
+Services marked global show once. Regional services show one group per region (see the `regions` prop).
+
+| Service | Scope | What you can browse | Read-only command(s) |
+|---|---|---|---|
+| S3 | global | buckets, then prefixes and objects | `s3api list-buckets`, `s3api list-objects-v2` |
+| IAM | global | users, roles, groups, local policies | `iam list-users`, `iam list-roles`, `iam list-groups`, `iam list-policies` |
+| Secrets Manager | regional | secrets | `secretsmanager list-secrets` |
+| Lambda | regional | functions | `lambda list-functions` |
+| ECR | regional | repositories and their images | `ecr describe-repositories`, `ecr describe-images` |
+| EC2 | regional | instances | `ec2 describe-instances` |
+| EFS | regional | file systems | `efs describe-file-systems` |
+| EKS | regional | clusters and one details row | `eks list-clusters`, `eks describe-cluster` |
+| RDS | regional | DB instances | `rds describe-db-instances` |
+| CloudWatch | regional | alarms and log groups | `cloudwatch describe-alarms`, `logs describe-log-groups` |
+| SSM Parameter Store | regional | parameters, with folders from their names | `ssm describe-parameters` |
+
+Values are never read: no secret values (Secrets Manager, SSM), no EC2 user data or console output, no Lambda code, no ECR image contents, no S3 object contents.
+
 ## Install
 
 Copy the mod folder into Herdr's mods directory:
@@ -30,7 +50,7 @@ Example: `--props '{"profile": "dev", "region": "eu-west-1"}'`.
 Several regions: `--props '{"profile": "dev", "regions": ["us-east-1", "eu-west-1"]}'`.
 An invalid region name is refused and nothing is shown. Without `regions`, the viewer uses one region as before.
 Without props, the mod reads `AWS_PROFILE`, then `AWS_REGION` or `AWS_DEFAULT_REGION`, from your login shell.
-The tab is renamed to the profile name, unless you named it yourself.
+The tab is renamed to `☁ <profile>`, unless you named it yourself.
 
 ## Read-only
 
@@ -105,5 +125,4 @@ Treat these tests as a check of response shapes, not of your account.
 
 ## Trademarks
 
-AWS, Amazon S3 and the AWS logos belong to Amazon. This project is not affiliated with, endorsed by or sponsored by AWS.
-The mod ships a neutral cloud icon. If you want an AWS logo, add your own locally and follow AWS's terms.
+AWS and Amazon S3 are trademarks of Amazon.com, Inc. or its affiliates. This project is not affiliated with, endorsed by or sponsored by AWS.

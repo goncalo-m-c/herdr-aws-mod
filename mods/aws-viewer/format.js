@@ -1,5 +1,13 @@
 // How the details pane shows a leaf's metadata. Pure, so node --test covers it.
 
+/** Plain-text cloud (U+2601) before the profile in the tab name. No emoji variation selector. */
+export const TAB_GLYPH = "\u2601 ";
+
+/** The tab name the mod sets: the glyph, then the profile. */
+export function autoTabName(profile) {
+  return `${TAB_GLYPH}${profile}`;
+}
+
 /** [[label, value]] for an S3 object, SSM parameter, IAM resource, secret, Lambda function, ECR image, EC2 instance, EFS file system, EKS cluster, RDS instance, CloudWatch alarm or log group; never a value or object content. */
 export function detailFields(node) {
   const m = node?.meta ?? {};
