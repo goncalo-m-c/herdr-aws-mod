@@ -92,7 +92,7 @@ docker run --rm --network none -v ~/.config/herdr-app/mods/aws-viewer:/w:ro -w /
 
 ## Limitations
 
-- This is a prototype. The author has only lightly tested it against real accounts.
+- This is an early release. It has been tested against a mock AWS (moto), not yet against a real AWS account.
 - SSM has no API that lists folders. Folders come from the parameters each page returns. A "Load more" may only add new folders.
 - SSM root and folder pages list all descendants recursively. The viewer groups them by the next path segment.
 - `$SHELL -lc` does not read `.zshrc`. Set `AWS_PROFILE` in `.zshenv` or `.zprofile`, or pass it as a prop.

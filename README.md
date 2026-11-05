@@ -1,6 +1,6 @@
 # Herdr Browser for AWS
 
-Herdr Browser for AWS is a read-only viewer for AWS resources, built as a [Herdr](https://herdr.dev) mod. It shows S3 buckets, IAM resources, Secrets Manager secrets, Lambda functions, ECR repositories and images, EC2 instances, EFS file systems, EKS clusters, RDS DB instances, CloudWatch alarms and log groups, and SSM Parameter Store parameters as a lazy tree with a details pane. It is a prototype.
+Herdr Browser for AWS is a read-only viewer for AWS resources, built as a [Herdr](https://herdr.dev) mod. It shows S3 buckets, IAM resources, Secrets Manager secrets, Lambda functions, ECR repositories and images, EC2 instances, EFS file systems, EKS clusters, RDS DB instances, CloudWatch alarms and log groups, and SSM Parameter Store parameters as a lazy tree with a details pane. It is an early release (0.1.0): it has been tested against a mock AWS (moto), not yet against a real AWS account.
 
 ![Herdr Browser for AWS](preview.png)
 
@@ -83,7 +83,7 @@ The mod never writes to AWS. Only `s3api list-buckets`, `s3api list-objects-v2`,
 
 ## Limitations
 
-- This is a prototype. The author tested it only lightly against real accounts.
+- This is an early release. It has been tested against a mock AWS (moto), not yet against a real AWS account.
 - SSM has no folder API. The mod derives folders on the client from the parameter names on each page.
 - It does not support remote machines.
 - It has no search and no keyboard navigation.
