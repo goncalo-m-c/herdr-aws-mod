@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage } from "../parse.js";
+import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage } from "../parse.js";
 
 const fixture = (name) => JSON.parse(readFileSync(new URL(`./fixtures/${name}.json`, import.meta.url), "utf8"));
 
@@ -91,4 +91,13 @@ test("ECR images page: tags, pushed date, size; untagged images use the digest",
   assert.deepEqual([page.items[0].meta.size, page.items[0].meta.pushed, page.items[1].meta.tags], [52428800, "2024-05-01T08:30:00+00:00", []]);
   assert.notEqual(page.items[0].id, page.items[1].id);
   assert.equal(page.nextToken, "example-images-token");
+});
+
+test("EC2 instances page: flattens reservations, keeps only the Name tag, never user data", () => {
+  const page = instancesPage(fixture("ec2-describe-instances"));
+  assert.deepEqual(page.items.map((i) => [i.kind, i.label]), [["ec2-instance", "web-1"], ["ec2-instance", "i-0123456789EXAMPLE2"], ["ec2-instance", "worker-1"]]);
+  assert.deepEqual(page.items[0].meta, { id: "i-0123456789EXAMPLE1", state: "running", type: "t3.micro", zone: "eu-west-1a", privateIp: "10.0.0.11" });
+  assert.ok(!JSON.stringify(page).includes("EXAMPLE-NOT-SHOWN") && !JSON.stringify(page).includes("Env"));
+  assert.equal(page.nextToken, "example-instances-token");
+  assert.deepEqual(instancesPage({}).items, []);
 });

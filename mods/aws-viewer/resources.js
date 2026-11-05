@@ -1,7 +1,7 @@
 // Which aws call loads a folder node's next page, and which parser reads it.
 // Pure, so node --test covers it.
-import { listBuckets, listObjects, describeParameters, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages } from "./aws-args.js";
-import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage } from "./parse.js";
+import { listBuckets, listObjects, describeParameters, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances } from "./aws-args.js";
+import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage } from "./parse.js";
 
 // `regional: true` services get one group per listed region; the rest (global, like S3) show once.
 export const SERVICES = [
@@ -14,6 +14,7 @@ export const SERVICES = [
   { id: "secrets", kind: "secrets", label: "Secrets Manager", regional: true },
   { id: "lambda", kind: "lambda", label: "Lambda", regional: true },
   { id: "ecr", kind: "ecr", label: "ECR", regional: true },
+  { id: "ec2", kind: "ec2", label: "EC2", regional: true },
   { id: "ssm", kind: "ssm", label: "SSM Parameter Store", path: "", regional: true },
 ];
 
@@ -29,6 +30,7 @@ const LOADERS = {
   lambda: { command: (_node, token) => listFunctions(token), parse: (_node, json) => functionsPage(json) },
   ecr: { command: (_node, token) => describeRepositories(token), parse: (_node, json) => repositoriesPage(json) },
   "ecr-repo": { command: (node, token) => describeImages(node.repository, token), parse: (node, json) => imagesPage(json, node.repository) },
+  ec2: { command: (_node, token) => describeInstances(token), parse: (_node, json) => instancesPage(json) },
   ssm: { command: (node, token) => describeParameters(node.path, token), parse: (node, json) => parametersPage(json, node.path) },
   "ssm-path": { command: (node, token) => describeParameters(node.path, token), parse: (node, json) => parametersPage(json, node.path) },
 };

@@ -125,6 +125,18 @@ export function imagesPage(json, repository) {
   return { items, nextToken: json?.NextToken ?? null };
 }
 
+/** ec2 describe-instances: instances sit under Reservations[].Instances[]. Only the Name tag is kept; never user data or other tags. */
+export function instancesPage(json) {
+  const items = (json?.Reservations ?? []).flatMap((r) => r.Instances ?? []).map((i) => {
+    const name = (i.Tags ?? []).find((tag) => tag.Key === "Name")?.Value || null;
+    return {
+      id: `ec2:${i.InstanceId}`, kind: "ec2-instance", label: name || i.InstanceId, name: name || i.InstanceId,
+      meta: { id: i.InstanceId ?? null, state: i.State?.Name ?? null, type: i.InstanceType ?? null, zone: i.Placement?.AvailabilityZone ?? null, privateIp: i.PrivateIpAddress ?? null },
+    };
+  });
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
 /** secretsmanager list-secrets: metadata only, never the secret value. */
 export function secretsPage(json) {
   const items = (json?.SecretList ?? []).map((s) => ({

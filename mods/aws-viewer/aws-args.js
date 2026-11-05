@@ -3,7 +3,7 @@
 
 export const PAGE_SIZE = 50;
 
-const READ_ONLY_COMMANDS = new Set(["s3api list-buckets", "s3api list-objects-v2", "ssm describe-parameters", "iam list-users", "iam list-roles", "iam list-groups", "iam list-policies", "secretsmanager list-secrets", "lambda list-functions", "ecr describe-repositories", "ecr describe-images", "configure get"]);
+const READ_ONLY_COMMANDS = new Set(["s3api list-buckets", "s3api list-objects-v2", "ssm describe-parameters", "iam list-users", "iam list-roles", "iam list-groups", "iam list-policies", "secretsmanager list-secrets", "lambda list-functions", "ecr describe-repositories", "ecr describe-images", "ec2 describe-instances", "configure get"]);
 const REGION = /^[a-z]{2}(-[a-z]+)+-\d+$/;
 // The CLI reads file:// (and similar) values from disk; a resource name must never do that.
 const URL_LIKE = /^[a-z][a-z0-9+.-]*:\/\//i;
@@ -54,6 +54,11 @@ export function describeRepositories(token) {
 
 export function describeImages(repository, token) {
   return ["ecr", "describe-images", flag("--repository-name", repository), `--max-items=${PAGE_SIZE}`, ...tokenArg("--starting-token", token)];
+}
+
+/** EC2 is paged by the CLI like IAM: --max-items and --starting-token (no --no-paginate). Instances sit under Reservations. */
+export function describeInstances(token) {
+  return ["ec2", "describe-instances", `--max-items=${PAGE_SIZE}`, ...tokenArg("--starting-token", token)];
 }
 
 /** The `regions` prop as a list of valid region names; throws Refusal on a bad one. Missing means []. */

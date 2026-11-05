@@ -67,3 +67,8 @@ test("ECR image details show tags, pushed date and size", () => {
   assert.deepEqual(fields.slice(0, 4), [["Repository", "api"], ["Tags", "latest, v1"], ["Pushed", "2024-05-01 08:30 UTC"], ["Size", "50 MB (52,428,800 bytes)"]]);
   assert.equal(detailFields({ kind: "ecr-image", meta: {} })[1][1], "(untagged)");
 });
+
+test("EC2 instance details show id, name, state, type, zone and private IP", () => {
+  const fields = detailFields({ kind: "ec2-instance", name: "web-1", meta: { id: "i-0123456789EXAMPLE1", state: "running", type: "t3.micro", zone: "eu-west-1a", privateIp: "10.0.0.11" } });
+  assert.deepEqual(fields, [["Instance ID", "i-0123456789EXAMPLE1"], ["Name", "web-1"], ["State", "running"], ["Type", "t3.micro"], ["Zone", "eu-west-1a"], ["Private IP", "10.0.0.11"]]);
+});

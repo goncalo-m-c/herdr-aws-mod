@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
+import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
 
 const DEV = { profile: "dev", region: "eu-west-1" };
 
@@ -124,6 +124,21 @@ test("ECR describe calls are allowed, CLI-paged, and writes are refused", () => 
   for (const command of [
     ["ecr", "get-login-password"], ["ecr", "get-authorization-token"], ["ecr", "batch-get-image"], ["ecr", "delete-repository", "--repository-name=x"],
     ["ecr", "create-repository"], ["ecr", "batch-delete-image"], ["ecr", "put-image"], ["ecr", "list-images", "--repository-name=x"],
+  ]) {
+    assert.equal(isReadOnly(command), false, command.join(" "));
+    assert.throws(() => invocation(command, DEV), Refusal, command.join(" "));
+  }
+});
+
+test("EC2 describe-instances is allowed, CLI-paged, and writes and risky reads are refused", () => {
+  assert.deepEqual(invocation(describeInstances(null), DEV), [
+    "ec2", "describe-instances", `--max-items=${PAGE_SIZE}`, "--profile=dev", "--region=eu-west-1", "--output=json", "--no-cli-pager", "--no-cli-auto-prompt",
+  ]);
+  assert.ok(describeInstances("t").includes("--starting-token=t"));
+  assert.ok(!describeInstances("t").includes("--no-paginate"));
+  for (const command of [
+    ["ec2", "run-instances"], ["ec2", "terminate-instances", "--instance-ids=i-0123456789EXAMPLE1"], ["ec2", "get-console-output", "--instance-id=i-0123456789EXAMPLE1"],
+    ["ec2", "get-password-data", "--instance-id=i-0123456789EXAMPLE1"], ["ec2", "describe-instance-attribute", "--attribute=userData"], ["ec2", "start-instances"],
   ]) {
     assert.equal(isReadOnly(command), false, command.join(" "));
     assert.throws(() => invocation(command, DEV), Refusal, command.join(" "));
