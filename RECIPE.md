@@ -1,8 +1,8 @@
-# AWS Viewer
+# Herdr Browser for AWS
 
 A read-only browser for your AWS account, in a Herdr tab. A header shows the profile and region. Below it, a tree lists eleven services: S3, IAM, Secrets Manager, Lambda, ECR, EC2, EFS, EKS, RDS, CloudWatch and SSM Parameter Store. Selecting an item opens its metadata at the right. You can pass one region, or a list of regions so each regional service gets one group per region.
 
-![AWS Viewer](preview.png)
+![Herdr Browser for AWS](preview.png)
 
 ## What you see
 

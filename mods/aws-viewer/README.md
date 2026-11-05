@@ -1,4 +1,4 @@
-# aws-viewer (prototype)
+# Herdr Browser for AWS
 
 A read-only AWS resource viewer laid out like a file browser. It covers S3, IAM, Secrets Manager, Lambda, ECR, EC2, EFS, EKS, RDS, CloudWatch and SSM Parameter Store.
 
