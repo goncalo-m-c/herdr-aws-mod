@@ -1,6 +1,6 @@
 # aws-viewer
 
-A read-only AWS viewer for [Herdr](https://herdr.dev). It shows S3 buckets and SSM Parameter Store parameters as a lazy tree with a details pane. It is a prototype.
+A read-only AWS viewer for [Herdr](https://herdr.dev). It shows S3 buckets, IAM resources, Secrets Manager secrets and SSM Parameter Store parameters as a lazy tree with a details pane. It is a prototype.
 
 ![AWS Viewer](preview.png)
 
@@ -24,7 +24,7 @@ Launch props (all optional):
 
 - `profile`: the AWS profile to use.
 - `region`: the AWS region to use.
-- `regions`: a list of AWS regions. Regional services (SSM) show one group per region. Global services (S3) show once.
+- `regions`: a list of AWS regions. Regional services (SSM, Secrets Manager) show one group per region. Global services (S3, IAM) show once.
 
 Example: `--props '{"profile": "dev", "region": "eu-west-1"}'`.
 Several regions: `--props '{"profile": "dev", "regions": ["us-east-1", "eu-west-1"]}'`.
@@ -34,7 +34,7 @@ The tab is renamed to the profile name, unless you named it yourself.
 
 ## Read-only
 
-The mod never writes to AWS. Only `s3api list-buckets`, `s3api list-objects-v2`, `ssm describe-parameters` and `configure get` are allowed. Any argument that contains `decryption` is refused.
+The mod never writes to AWS. Only `s3api list-buckets`, `s3api list-objects-v2`, `ssm describe-parameters`, `iam list-users`, `iam list-roles`, `iam list-groups`, `iam list-policies`, `secretsmanager list-secrets` and `configure get` are allowed. Any argument that contains `decryption` is refused.
 
 ## What it does on your computer
 
@@ -42,10 +42,12 @@ The mod never writes to AWS. Only `s3api list-buckets`, `s3api list-objects-v2`,
   - `aws s3api list-buckets`
   - `aws s3api list-objects-v2`
   - `aws ssm describe-parameters`
+  - `aws iam list-users`, `aws iam list-roles`, `aws iam list-groups`, `aws iam list-policies --scope=Local`
+  - `aws secretsmanager list-secrets`
   - `aws configure get region` (a local read of your AWS config)
 - It runs one `sh -c` login-shell call to read `AWS_PROFILE`, `AWS_REGION` and `AWS_DEFAULT_REGION`.
 - It writes nothing: no files, no logs, no AWS changes.
-- It shows no secrets. SSM parameter values are never fetched, only metadata.
+- It shows no secrets. SSM parameter values and Secrets Manager secret values are never fetched, only metadata.
 - It never downloads S3 contents, only listings.
 - Network access happens only through the AWS CLI.
 
