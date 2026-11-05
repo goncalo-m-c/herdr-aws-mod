@@ -103,6 +103,28 @@ export function functionsPage(json) {
   return { items, nextToken: json?.NextToken ?? null };
 }
 
+/** ecr describe-repositories: each repository is a folder of images. */
+export function repositoriesPage(json) {
+  const items = (json?.repositories ?? []).map((r) => ({
+    id: `ecr:${r.repositoryName}`, kind: "ecr-repo", label: r.repositoryName, repository: r.repositoryName,
+    meta: { arn: r.repositoryArn ?? null, uri: r.repositoryUri ?? null, created: r.createdAt ?? null },
+  }));
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
+/** ecr describe-images: metadata only, never image layers. Untagged images are labelled by a short digest. */
+export function imagesPage(json, repository) {
+  const items = (json?.imageDetails ?? []).map((d) => {
+    const tags = d.imageTags ?? [];
+    const digest = d.imageDigest ?? "";
+    return {
+      id: `ecri:${repository}/${digest}`, kind: "ecr-image", label: tags.length ? tags.join(", ") : digest.slice(0, 19) || "(untagged)", name: repository, repository,
+      meta: { tags, digest: digest || null, pushed: d.imagePushedAt ?? null, size: d.imageSizeInBytes ?? null },
+    };
+  });
+  return { items, nextToken: json?.NextToken ?? null };
+}
+
 /** secretsmanager list-secrets: metadata only, never the secret value. */
 export function secretsPage(json) {
   const items = (json?.SecretList ?? []).map((s) => ({

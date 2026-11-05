@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage } from "../parse.js";
+import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage } from "../parse.js";
 
 const fixture = (name) => JSON.parse(readFileSync(new URL(`./fixtures/${name}.json`, import.meta.url), "utf8"));
 
@@ -75,4 +75,20 @@ test("Lambda functions page: name, runtime, memory, last modified, token", () =>
   assert.equal(page.items[1].meta.runtime, "Image");
   assert.equal(page.nextToken, "example-functions-token");
   assert.equal(functionsPage({}).nextToken, null);
+});
+
+test("ECR repositories page: folders with metadata and token", () => {
+  const page = repositoriesPage(fixture("ecr-describe-repositories"));
+  assert.deepEqual(page.items.map((i) => [i.kind, i.label, i.repository]), [["ecr-repo", "team/web", "team/web"], ["ecr-repo", "api", "api"]]);
+  assert.equal(page.items[0].meta.uri, "123456789012.dkr.ecr.eu-west-1.amazonaws.com/team/web");
+  assert.equal(page.nextToken, "example-repos-token");
+  assert.deepEqual(repositoriesPage({}).items, []);
+});
+
+test("ECR images page: tags, pushed date, size; untagged images use the digest", () => {
+  const page = imagesPage(fixture("ecr-describe-images"), "api");
+  assert.deepEqual(page.items.map((i) => [i.kind, i.label]), [["ecr-image", "latest, v1.2.0"], ["ecr-image", "sha256:examplediges"]]);
+  assert.deepEqual([page.items[0].meta.size, page.items[0].meta.pushed, page.items[1].meta.tags], [52428800, "2024-05-01T08:30:00+00:00", []]);
+  assert.notEqual(page.items[0].id, page.items[1].id);
+  assert.equal(page.nextToken, "example-images-token");
 });

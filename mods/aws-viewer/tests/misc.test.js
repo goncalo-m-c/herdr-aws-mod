@@ -61,3 +61,9 @@ test("Lambda details show name, runtime, memory and last modified", () => {
   const fields = detailFields({ kind: "lambda-function", name: "report-builder", meta: { runtime: "python3.12", memory: 256, lastModified: "2024-05-01T08:30:00.000+0000" } });
   assert.deepEqual(fields.slice(0, 4), [["Name", "report-builder"], ["Runtime", "python3.12"], ["Memory", "256 MB"], ["Last modified", "2024-05-01 08:30 UTC"]]);
 });
+
+test("ECR image details show tags, pushed date and size", () => {
+  const fields = detailFields({ kind: "ecr-image", repository: "api", meta: { tags: ["latest", "v1"], pushed: "2024-05-01T08:30:00+00:00", size: 52428800, digest: "sha256:x" } });
+  assert.deepEqual(fields.slice(0, 4), [["Repository", "api"], ["Tags", "latest, v1"], ["Pushed", "2024-05-01 08:30 UTC"], ["Size", "50 MB (52,428,800 bytes)"]]);
+  assert.equal(detailFields({ kind: "ecr-image", meta: {} })[1][1], "(untagged)");
+});

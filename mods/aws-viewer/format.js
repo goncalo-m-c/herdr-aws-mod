@@ -35,6 +35,10 @@ export function detailFields(node) {
     ["Name", node.name], ["Runtime", m.runtime ?? "—"], ["Memory", m.memory != null ? `${m.memory} MB` : "—"], ["Last modified", formatDate(m.lastModified)],
     ["ARN", m.arn ?? "—"],
   ];
+  if (node?.kind === "ecr-image") return [
+    ["Repository", node.repository], ["Tags", m.tags?.length ? m.tags.join(", ") : "(untagged)"], ["Pushed", formatDate(m.pushed)],
+    ["Size", sizeWithBytes(m.size)], ["Digest", m.digest ?? "—"],
+  ];
   return [];
 }
 

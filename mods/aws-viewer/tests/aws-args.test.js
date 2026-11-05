@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
+import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
 
 const DEV = { profile: "dev", region: "eu-west-1" };
 
@@ -107,6 +107,23 @@ test("list-functions is allowed, one CLI-paged call, and other Lambda calls are 
   for (const command of [
     ["lambda", "invoke", "--function-name=x"], ["lambda", "get-function", "--function-name=x"], ["lambda", "create-function"],
     ["lambda", "delete-function", "--function-name=x"], ["lambda", "update-function-code"], ["lambda", "list-layers"],
+  ]) {
+    assert.equal(isReadOnly(command), false, command.join(" "));
+    assert.throws(() => invocation(command, DEV), Refusal, command.join(" "));
+  }
+});
+
+test("ECR describe calls are allowed, CLI-paged, and writes are refused", () => {
+  assert.deepEqual(invocation(describeRepositories(null), DEV), [
+    "ecr", "describe-repositories", `--max-items=${PAGE_SIZE}`, "--profile=dev", "--region=eu-west-1", "--output=json", "--no-cli-pager", "--no-cli-auto-prompt",
+  ]);
+  assert.deepEqual(describeImages("team/web", "t"), ["ecr", "describe-images", "--repository-name=team/web", `--max-items=${PAGE_SIZE}`, "--starting-token=t"]);
+  assert.ok(isReadOnly(describeImages("api", null)));
+  assert.ok(!describeRepositories("t").includes("--no-paginate") && !describeImages("api", "t").includes("--no-paginate"));
+  assert.throws(() => describeImages("file://etc/passwd", null), Refusal);
+  for (const command of [
+    ["ecr", "get-login-password"], ["ecr", "get-authorization-token"], ["ecr", "batch-get-image"], ["ecr", "delete-repository", "--repository-name=x"],
+    ["ecr", "create-repository"], ["ecr", "batch-delete-image"], ["ecr", "put-image"], ["ecr", "list-images", "--repository-name=x"],
   ]) {
     assert.equal(isReadOnly(command), false, command.join(" "));
     assert.throws(() => invocation(command, DEV), Refusal, command.join(" "));

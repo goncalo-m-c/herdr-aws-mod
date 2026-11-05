@@ -8,6 +8,7 @@ const NOTES = {
   parameter: "Metadata from describe-parameters. Parameter values are never read or shown.",
   secret: "Metadata from list-secrets. Secret values are never read or shown.",
   "lambda-function": "Metadata from lambda list-functions. Function code is never downloaded.",
+  "ecr-image": "Metadata from ecr describe-images. Image contents are never pulled.",
   "iam-user": "Metadata from iam list-users.",
   "iam-role": "Metadata from iam list-roles.",
   "iam-group": "Metadata from iam list-groups.",

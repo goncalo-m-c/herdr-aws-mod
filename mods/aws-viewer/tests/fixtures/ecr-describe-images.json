@@ -1,0 +1,7 @@
+{
+    "imageDetails": [
+        { "registryId": "123456789012", "repositoryName": "api", "imageDigest": "sha256:exampledigest0000000000000000000000000000000000000000000000000001", "imageTags": ["latest", "v1.2.0"], "imageSizeInBytes": 52428800, "imagePushedAt": "2024-05-01T08:30:00+00:00" },
+        { "registryId": "123456789012", "repositoryName": "api", "imageDigest": "sha256:exampledigest0000000000000000000000000000000000000000000000000002", "imageSizeInBytes": 1024, "imagePushedAt": "2024-04-01T08:30:00+00:00" }
+    ],
+    "NextToken": "example-images-token"
+}
