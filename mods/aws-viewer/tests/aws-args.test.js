@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, describeFileSystems, listClusters, describeCluster, describeDbInstances, describeAlarms, describeLogGroups, regionList, Refusal, PAGE_SIZE } from "../aws-args.js";
+import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, describeFileSystems, listClusters, describeCluster, describeDbInstances, describeAlarms, describeLogGroups, regionList, pickRegions, needsRegionLookup, regionsOutcome, NO_REGION_MESSAGE, Refusal, PAGE_SIZE } from "../aws-args.js";
 
 const DEV = { profile: "dev", region: "eu-west-1" };
 
@@ -206,4 +206,29 @@ test("CloudWatch Logs describe-log-groups is allowed and CLI-paged; reading log 
     assert.equal(isReadOnly(command), false, command.join(" "));
     assert.throws(() => invocation(command, DEV), Refusal, command.join(" "));
   }
+});
+
+test("pickRegions prefers the list, then the fallback, else none", () => {
+  assert.deepEqual(pickRegions(["eu-west-1"], "us-east-1"), ["eu-west-1"]);
+  assert.deepEqual(pickRegions(undefined, "us-east-1"), ["us-east-1"]);
+  assert.deepEqual(pickRegions(undefined, ""), []);
+});
+
+test("regionsOutcome: a bad regions prop gives no regions and the refusal", () => {
+  const out = regionsOutcome("us east", "us-east-1");
+  assert.equal(out.regions, null);
+  assert.match(out.error, /not a valid AWS region name/);
+});
+
+test("regionsOutcome: no region says so, a failed lookup shows its error", () => {
+  assert.deepEqual(regionsOutcome(undefined, ""), { regions: [], error: NO_REGION_MESSAGE });
+  assert.deepEqual(regionsOutcome(undefined, "", "Profile x is not in your AWS config."), { regions: [], error: "Profile x is not in your AWS config." });
+  assert.deepEqual(regionsOutcome(["eu-west-1"], "", "ignored"), { regions: ["eu-west-1"], error: "" });
+});
+
+test("needsRegionLookup only when no region and no usable regions prop", () => {
+  assert.equal(needsRegionLookup(undefined, ""), true);
+  assert.equal(needsRegionLookup(["eu-west-1"], ""), false);
+  assert.equal(needsRegionLookup(undefined, "us-east-1"), false);
+  assert.equal(needsRegionLookup("bad", ""), false);
 });

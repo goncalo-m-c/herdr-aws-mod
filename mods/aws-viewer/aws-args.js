@@ -100,6 +100,28 @@ export function regionList(value) {
   return [...new Set(list)];
 }
 
+export const NO_REGION_MESSAGE = "No region set. Pass `region` or `regions`.";
+
+/** The regions to show: the `regions` prop, else the single fallback region, else []. */
+export function pickRegions(value, fallbackRegion) {
+  const listed = regionList(value);
+  return listed.length ? listed : [fallbackRegion].filter(Boolean);
+}
+
+/** True when no region is known yet: none from props/env and no usable `regions` prop. */
+export function needsRegionLookup(value, region) {
+  if (region) return false;
+  try { return !regionList(value).length; } catch { return false; }
+}
+
+/** The regions to show and the header error. `regions` is null when the prop is invalid. */
+export function regionsOutcome(value, region, lookupError = "") {
+  let regions;
+  try { regions = pickRegions(value, region); }
+  catch (e) { return { regions: null, error: e.message }; }
+  return { regions, error: regions.length ? "" : lookupError || NO_REGION_MESSAGE };
+}
+
 /** Local only: reads the profile's region from ~/.aws/config. */
 export function configuredRegion() {
   return ["configure", "get", "region"];
