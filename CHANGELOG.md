@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/goncalo-m-c/herdr-aws-mod/compare/v0.2.0...v0.2.1) (2026-11-06)
+
+
+### Documentation
+
+* update the preview image ([#27](https://github.com/goncalo-m-c/herdr-aws-mod/issues/27)) ([be03b0a](https://github.com/goncalo-m-c/herdr-aws-mod/commit/be03b0a225f7c70e1c3e78d5f26eaac8c96acdab))
+
 ## [0.2.0](https://github.com/goncalo-m-c/herdr-aws-mod/compare/v0.1.1...v0.2.0) (2026-11-06)
 
 
