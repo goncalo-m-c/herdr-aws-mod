@@ -6,10 +6,10 @@ import { props, theme } from "herdr";
 import { nameTabAfterProfile, shownViewerTabId } from "./tab-name.js";
 import { needsShellEnv, resolveTarget } from "./context.js";
 import { loginShellEnv } from "./env.js";
-import { regionList } from "./aws-args.js";
+import { needsRegionLookup, regionsOutcome } from "./aws-args.js";
 import { runAws, profileRegion } from "./aws.js";
 import { SERVICES, isFolder, pageCommand, parsePage } from "./resources.js";
-import { createTree, toggle, startLoad, finishLoad, failLoad, refresh, select, visibleRows } from "./tree.js";
+import { createTree, emptyTree, toggle, startLoad, finishLoad, failLoad, refresh, select, visibleRows } from "./tree.js";
 import { treeRow } from "./rows.js";
 import { detailsPane } from "./details.js";
 
@@ -32,7 +32,7 @@ export default class AwsViewer extends View {
   // A session: one profile/region and one tree. Starting again drops the old one's results.
   startSession(cx) {
     const session = this.session = {};
-    this.tree = createTree(SERVICES);
+    this.tree = emptyTree();
     this.target = null;
     this.shownRegion = "";
     this.regionsError = "";
@@ -43,18 +43,23 @@ export default class AwsViewer extends View {
       const shell = needsShellEnv(given) ? await loginShellEnv() : {};
       if (this.session !== session) return;
       this.target = resolveTarget(given, shell);
-      this.useRegions(given.regions);
-      this.shownRegion = this.target.region;
+      let region = this.target.region, lookupError = "";
+      if (needsRegionLookup(given.regions, region)) {
+        try { region = await profileRegion(this.target); } catch (e) { lookupError = e.message; }
+        if (this.session !== session) return;
+      }
+      this.shownRegion = region;
+      this.useRegions(given.regions, region, lookupError);
       this.nameTab();
       cx.notify();
-      if (!this.target.region) this.lookupRegion(session, cx);
     });
   }
 
-  // The `regions` prop picks the tree's groups; a bad one shows an error and an empty tree.
-  useRegions(regions) {
-    try { this.tree = createTree(SERVICES, regionList(regions)); this.regionsError = ""; }
-    catch (e) { this.tree = createTree([]); this.regionsError = e.message; }
+  // Region folders need a region; with none, show the error and only `global`. A bad `regions` prop shows nothing.
+  useRegions(regions, fallbackRegion, lookupError) {
+    const outcome = regionsOutcome(regions, fallbackRegion, lookupError);
+    this.tree = outcome.regions ? createTree(SERVICES, outcome.regions) : emptyTree();
+    this.regionsError = outcome.error;
   }
 
   // Retried on render for a few seconds: Herdr may not list our pane yet when we start.
@@ -64,15 +69,6 @@ export default class AwsViewer extends View {
     if (!this.tabId) return;
     this.autoTabName = nameTabAfterProfile(this.tabId, this.target.profile, this.autoTabName);
     this.tabNamed = true;
-  }
-
-  lookupRegion(session, cx) {
-    cx.spawn(async (cx) => {
-      const region = await profileRegion(this.target);
-      if (this.session !== session) return;
-      this.shownRegion = region;
-      cx.notify();
-    });
   }
 
   activate(id, cx) {

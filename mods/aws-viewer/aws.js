@@ -11,15 +11,23 @@ export async function runAws(command, target) {
   catch { throw new Error("The aws CLI returned output this viewer cannot read."); }
 }
 
-/** The profile's region from ~/.aws/config (a local read), or "" when unset. */
+/** The profile's region from ~/.aws/config (a local read). "" means none is set; a failed lookup throws. */
 export async function profileRegion(target) {
-  try { return (await runGuarded(configuredRegion(), target)).trim(); }
-  catch { return ""; }
+  const result = await execAws(configuredRegion(), target);
+  // `configure get` exits 1 with no output when the key is unset.
+  if (result.code !== 0 && !String(result.stderr ?? "").trim()) return "";
+  return checked(result, target).trim();
 }
 
 async function runGuarded(command, target) {
-  const argv = invocation(command, target);
-  const result = await exec("aws", argv).catch((e) => { throw new Error(describeExecFailure(e)); });
+  return checked(await execAws(command, target), target);
+}
+
+async function execAws(command, target) {
+  return exec("aws", invocation(command, target)).catch((e) => { throw new Error(describeExecFailure(e)); });
+}
+
+function checked(result, target) {
   if (result.code !== 0) throw new Error(describeAwsError(result.stderr, target.profile));
   return result.stdout;
 }

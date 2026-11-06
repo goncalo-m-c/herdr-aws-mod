@@ -3,7 +3,7 @@
 import { listBuckets, listObjects, describeParameters, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, describeFileSystems, listClusters, describeCluster, describeDbInstances, describeAlarms, describeLogGroups } from "./aws-args.js";
 import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage, fileSystemsPage, clustersPage, clusterDetailsPage, dbInstancesPage, alarmsPage, logGroupsPage } from "./parse.js";
 
-// `regional: true` services get one group per listed region; the rest (global, like S3) show once.
+// `regional: true` services sit in a region folder, one per listed region; the rest (like S3) sit once in the `global` folder.
 export const SERVICES = [
   { id: "s3", kind: "s3", label: "S3" },
   // IAM is global: shown once, with fixed folders (no call) that each list one kind of IAM resource.
@@ -18,7 +18,7 @@ export const SERVICES = [
   { id: "efs", kind: "efs", label: "EFS", regional: true },
   { id: "eks", kind: "eks", label: "EKS", regional: true },
   { id: "rds", kind: "rds", label: "RDS", regional: true },
-  // CloudWatch is regional with fixed folders: each region group holds Alarms and Log groups.
+  // CloudWatch is regional with fixed folders: each region folder holds Alarms and Log groups.
   { id: "cloudwatch", kind: "cloudwatch", label: "CloudWatch", regional: true, folders: [
     { kind: "cw-alarms", label: "Alarms" }, { kind: "cw-log-groups", label: "Log groups" },
   ] },
@@ -52,7 +52,7 @@ export function isFolder(node) {
   return Boolean(node && (LOADERS[node.kind] || isGroupNode(node)));
 }
 
-/** Folders that only hold other folders and make no aws call: region groups and roots with fixed folders (IAM, CloudWatch). */
+/** Folders that only hold other folders and make no aws call: the `global` and region folders, and roots with fixed folders (IAM, CloudWatch). */
 export function isGroupNode(node) {
   return node?.kind === "regions" || node?.kind === "iam" || Boolean(node?.group);
 }

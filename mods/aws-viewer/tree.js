@@ -2,27 +2,41 @@
 // Pure, so node --test covers it. A "ticket" ties a load to the request that started it.
 import { isFolder, isGroupNode } from "./resources.js";
 
-/** `regions` (optional): regional services get a "regions" node with one group per region. */
+/** A tree with no rows. */
+export function emptyTree() {
+  return { nodes: new Map(), roots: [], selected: null };
+}
+
+/** `global` (non-regional services) first, then one folder per region (regional services, ids suffixed `@region`). */
 export function createTree(services, regions = []) {
-  const tree = { nodes: new Map(), roots: [], selected: null };
-  for (const spec of services) {
-    tree.roots.push(spec.id);
-    if (spec.folders && !(spec.regional && regions.length)) { addFixedFolders(tree, spec); continue; }
-    if (!spec.regional || !regions.length) { tree.nodes.set(spec.id, makeNode(spec)); continue; }
-    const groups = regions.map((region) => ({ ...spec, id: `${spec.id}@${region}`, label: region, region }));
-    for (const group of groups) {
-      if (group.folders) addFixedFolders(tree, group); // a region group with fixed folders (CloudWatch)
-      else tree.nodes.set(group.id, makeNode(group));
-    }
-    tree.nodes.set(spec.id, { ...makeNode({ id: spec.id, kind: "regions", label: spec.label }), loaded: true, children: groups.map((g) => g.id) });
+  const tree = emptyTree();
+  addFolder(tree, "global", "global", services.filter((s) => !s.regional));
+  for (const region of regions) {
+    const regional = services.filter((s) => s.regional).map((s) => ({ ...s, id: `${s.id}@${region}`, region }));
+    addFolder(tree, `region:${region}`, region, regional);
   }
   return tree;
 }
 
-// A service (or one region group) with fixed folders: the root is already loaded, each folder loads its own list.
+// A top-level folder: already loaded, it only holds services, so opening it makes no call.
+function addFolder(tree, id, label, specs) {
+  for (const spec of specs) addService(tree, spec);
+  tree.nodes.set(id, { ...makeNode({ id, kind: "regions", label }), loaded: true, children: specs.map((s) => s.id) });
+  tree.roots.push(id);
+}
+
+function addService(tree, spec) {
+  if (spec.folders) addFixedFolders(tree, spec);
+  else tree.nodes.set(spec.id, makeNode(spec));
+}
+
+// A service with fixed folders: the root is already loaded, each folder loads its own list.
 function addFixedFolders(tree, spec) {
   const { folders, ...root } = spec;
-  const children = folders.map((folder) => makeNode({ ...folder, id: `${spec.id}:${folder.kind}`, ...(spec.region ? { region: spec.region } : {}) }));
+  const baseId = spec.region ? spec.id.slice(0, -(spec.region.length + 1)) : spec.id;
+  const suffix = spec.region ? `@${spec.region}` : "";
+  const regionField = spec.region ? { region: spec.region } : {};
+  const children = folders.map((folder) => makeNode({ ...folder, id: `${baseId}:${folder.kind}${suffix}`, ...regionField }));
   for (const child of children) tree.nodes.set(child.id, child);
   tree.nodes.set(spec.id, { ...makeNode(root), group: true, loaded: true, children: children.map((c) => c.id) });
 }
