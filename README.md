@@ -12,7 +12,7 @@ The tree has a `global` folder first (S3, IAM), then one folder per region with 
 
 | Service | Scope | What you can browse | Read-only command(s) |
 |---|---|---|---|
-| S3 | global | buckets, then prefixes and objects | `s3api list-buckets`, `s3api list-objects-v2` |
+| S3 | global | buckets (with details), then prefixes and objects | `s3api list-buckets`, `s3api list-objects-v2`, `s3api get-bucket-ownership-controls`, `s3api get-bucket-versioning`, `s3api get-bucket-encryption`, `s3api get-public-access-block` |
 | IAM | global | users, roles, groups, local policies | `iam list-users`, `iam list-roles`, `iam list-groups`, `iam list-policies` |
 | Secrets Manager | regional | secrets | `secretsmanager list-secrets` |
 | Lambda | regional | functions | `lambda list-functions` |
@@ -61,6 +61,7 @@ The mod never writes to AWS. Only `s3api list-buckets`, `s3api list-objects-v2`,
 - It runs `aws` with exactly these subcommands, and only these:
   - `aws s3api list-buckets`
   - `aws s3api list-objects-v2`
+  - `aws s3api get-bucket-ownership-controls`, `aws s3api get-bucket-versioning`, `aws s3api get-bucket-encryption`, `aws s3api get-public-access-block` (run when you select a bucket)
   - `aws ssm describe-parameters`
   - `aws iam list-users`, `aws iam list-roles`, `aws iam list-groups`, `aws iam list-policies --scope=Local`
   - `aws secretsmanager list-secrets`
