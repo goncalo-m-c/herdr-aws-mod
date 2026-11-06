@@ -109,6 +109,9 @@ test("autoTabName puts a plain cloud glyph and one space before the profile", ()
 test("field errors: not set, no access, or the short text", () => {
   assert.equal(describeFieldError("An error occurred (OwnershipControlsNotFoundError) when calling it"), "Not set");
   assert.equal(describeFieldError("An error occurred (NoSuchPublicAccessBlockConfiguration) when calling it"), "Not set");
-  assert.equal(describeFieldError(describeAwsError("An error occurred (AccessDenied) when calling the GetBucketVersioning operation", "p")), "No access");
+  for (const code of ["AccessDenied", "AccessDeniedException"]) {
+    const stderr = `An error occurred (${code}) when calling the GetBucketVersioning operation: Access Denied`;
+    assert.equal(describeFieldError(describeAwsError(stderr, "p"), stderr), "No access", code);
+  }
   assert.equal(describeFieldError("Cannot reach AWS. Check the network or VPN, then refresh."), "Cannot reach AWS. Check the network or VPN, then refresh.");
 });

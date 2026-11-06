@@ -48,6 +48,14 @@ const LOADERS = {
   "ssm-path": { command: (node, token) => describeParameters(node.path, token), parse: (node, json) => parametersPage(json, node.path) },
 };
 
+// Folder kinds that also show a details pane when selected.
+const DETAIL_KINDS = new Set(["bucket"]);
+
+/** True for a folder whose click also selects it, to show its details. */
+export function hasDetails(node) {
+  return DETAIL_KINDS.has(node?.kind);
+}
+
 export function isFolder(node) {
   return Boolean(node && (LOADERS[node.kind] || isGroupNode(node)));
 }

@@ -27,11 +27,12 @@ export function describeAwsError(stderr, profile) {
 }
 
 const NOT_SET = /NotFoundError|NoSuchPublicAccessBlockConfiguration/;
+const NO_ACCESS = /AccessDenied/;
 
-/** One details field failed: `message` is what describeAwsError made. Shown in that row only. */
-export function describeFieldError(message) {
-  if (NOT_SET.test(message)) return "Not set";
-  if (/^Access denied/.test(message)) return "No access";
+/** One details field failed: `message` is what describeAwsError made, `stderr` the raw aws text (codes live there). Shown in that row only. */
+export function describeFieldError(message, stderr = message) {
+  if (NOT_SET.test(stderr)) return "Not set";
+  if (NO_ACCESS.test(stderr)) return "No access";
   return message;
 }
 

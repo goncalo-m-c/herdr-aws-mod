@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createTree, emptyTree, toggle, startLoad, finishLoad, failLoad, refresh, select, visibleRows } from "../tree.js";
+import { createTree, emptyTree, toggle, activate, startLoad, finishLoad, failLoad, refresh, select, visibleRows } from "../tree.js";
 import { SERVICES } from "../resources.js";
 
 const US = "us-east-1", EU = "eu-west-1";
@@ -169,4 +169,18 @@ test("CloudWatch holds its own folders per region, loaded in that region", () =>
   assert.equal(toggle(tree, id), true);
   finishLoad(tree, id, startLoad(tree, id), { items: [{ id: "cwa:high-cpu", kind: "cw-alarm", label: "high-cpu" }], nextToken: null });
   assert.equal(tree.nodes.get(`cwa:high-cpu@${EU}`).region, EU);
+});
+
+test("a bucket under global > S3 is selected on click, a top-level folder is only toggled", () => {
+  const tree = createTree(SERVICES, [US]);
+  for (const id of ["global", `region:${US}`]) {
+    activate(tree, id);
+    assert.equal(tree.selected, null, id);
+    assert.equal(tree.nodes.get(id).open, true, id);
+  }
+  assert.equal(activate(tree, "s3"), true);
+  finishLoad(tree, "s3", startLoad(tree, "s3"), { items: [bucket("b")], nextToken: null });
+  assert.equal(activate(tree, "s3b:b"), true);
+  assert.equal(tree.selected, "s3b:b");
+  assert.equal(tree.nodes.get("s3b:b").open, true);
 });

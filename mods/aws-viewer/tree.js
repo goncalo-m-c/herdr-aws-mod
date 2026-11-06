@@ -1,6 +1,6 @@
 // Lazy tree state: folders load on first open, one page at a time; stale results are dropped.
 // Pure, so node --test covers it. A "ticket" ties a load to the request that started it.
-import { isFolder, isGroupNode } from "./resources.js";
+import { isFolder, isGroupNode, hasDetails } from "./resources.js";
 
 /** A tree with no rows. */
 export function emptyTree() {
@@ -49,6 +49,14 @@ export function toggle(tree, id) {
   return node.open && !node.loaded && !node.loading;
 }
 
+/** A click: toggles a folder and selects any node that has details. True when the folder needs its first page. */
+export function activate(tree, id) {
+  const node = tree.nodes.get(id);
+  const needsPage = toggle(tree, id);
+  if (node && (!isFolder(node) || hasDetails(node))) select(tree, id);
+  return needsPage;
+}
+
 /** A ticket for the next load, or null while one runs (the overlap guard) or with no next page. */
 export function startLoad(tree, id, { more = false } = {}) {
   const node = tree.nodes.get(id);
@@ -86,7 +94,7 @@ export function refresh(tree, id) {
   const node = tree.nodes.get(id);
   if (!node || !isFolder(node) || isGroupNode(node)) return false;
   dropChildren(tree, node);
-  Object.assign(node, { open: true, loaded: false, loading: false, error: null, nextToken: null, request: node.request + 1 });
+  Object.assign(node, { details: null, open: true, loaded: false, loading: false, error: null, nextToken: null, request: node.request + 1 });
   return true;
 }
 
@@ -140,5 +148,5 @@ function compareItems(a, b) {
 }
 
 function makeNode(spec) {
-  return { ...spec, open: false, loaded: false, loading: false, error: null, children: [], nextToken: null, request: 0 };
+  return { ...spec, open: false, loaded: false, loading: false, error: null, children: [], nextToken: null, request: 0, details: null };
 }

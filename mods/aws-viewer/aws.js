@@ -28,6 +28,6 @@ async function execAws(command, target) {
 }
 
 function checked(result, target) {
-  if (result.code !== 0) throw new Error(describeAwsError(result.stderr, target.profile));
+  if (result.code !== 0) throw Object.assign(new Error(describeAwsError(result.stderr, target.profile)), { stderr: result.stderr });
   return result.stdout;
 }

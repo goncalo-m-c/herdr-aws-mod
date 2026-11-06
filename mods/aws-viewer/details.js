@@ -4,6 +4,7 @@ import { v_flex, h_flex } from "gpui-base";
 import { detailFields } from "./format.js";
 
 const NOTES = {
+  bucket: "Name, region and created come from list-buckets. The rest load from four read-only s3api calls.",
   object: "Metadata from the bucket listing. Object contents are never downloaded.",
   parameter: "Metadata from describe-parameters. Parameter values are never read or shown.",
   secret: "Metadata from list-secrets. Secret values are never read or shown.",
