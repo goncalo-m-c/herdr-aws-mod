@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
-import { describeAwsError, describeExecFailure } from "../errors.js";
+import { describeAwsError, describeExecFailure, describeFieldError } from "../errors.js";
 import { parseShellEnv, resolveTarget, needsShellEnv, ENV_MARKER } from "../context.js";
 import { detailFields, formatSize, formatDate, autoTabName } from "../format.js";
 
@@ -104,4 +104,11 @@ test("autoTabName puts a plain cloud glyph and one space before the profile", ()
   assert.equal(autoTabName("dev"), "\u2601 dev");
   assert.equal(autoTabName("dev").codePointAt(0), 0x2601);
   assert.ok(!autoTabName("dev").includes("\uFE0F"));
+});
+
+test("field errors: not set, no access, or the short text", () => {
+  assert.equal(describeFieldError("An error occurred (OwnershipControlsNotFoundError) when calling it"), "Not set");
+  assert.equal(describeFieldError("An error occurred (NoSuchPublicAccessBlockConfiguration) when calling it"), "Not set");
+  assert.equal(describeFieldError(describeAwsError("An error occurred (AccessDenied) when calling the GetBucketVersioning operation", "p")), "No access");
+  assert.equal(describeFieldError("Cannot reach AWS. Check the network or VPN, then refresh."), "Cannot reach AWS. Check the network or VPN, then refresh.");
 });

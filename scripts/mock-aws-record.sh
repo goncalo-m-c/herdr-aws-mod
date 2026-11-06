@@ -25,7 +25,17 @@ file_name() { echo "$1${2:+.$2}${3:+.$3}.json"; }   # name, region (or empty), s
 
 record_one() {   # name region argv
   local name="$1" region="$2" argv="$3"
+  case "$name" in
+    s3-get-*) record_maybe_failing "$name" "$region" "$argv"; return ;;
+  esac
   run_argv "$argv" > "$OUT/$(file_name "$name" "$region" "")" < /dev/null
+}
+
+# Bucket settings can be unset, and the CLI then fails. Keep the error text as NAME.error.txt instead of the JSON.
+record_maybe_failing() {   # name region argv
+  local name="$1" region="$2" argv="$3" json err
+  json="$OUT/$(file_name "$name" "$region" "")"; err="${json%.json}.error.txt"
+  if run_argv "$argv" > "$json" 2> "$err" < /dev/null; then rm -f "$err"; else rm -f "$json"; fi
 }
 
 record_pages() {   # name region

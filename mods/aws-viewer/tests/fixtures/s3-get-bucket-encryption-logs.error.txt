@@ -1,0 +1,2 @@
+
+aws: [ERROR]: An error occurred (ServerSideEncryptionConfigurationNotFoundError) when calling the GetBucketEncryption operation: The server side encryption configuration was not found

@@ -1,8 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
-import { bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage, fileSystemsPage, clustersPage, clusterDetailsPage, dbInstancesPage, alarmsPage, logGroupsPage } from "../parse.js";
+import { ownershipText, versioningText, encryptionText, publicAccessText, bucketsPage, objectsPage, parametersPage, usersPage, rolesPage, groupsPage, policiesPage, secretsPage, functionsPage, repositoriesPage, imagesPage, instancesPage, fileSystemsPage, clustersPage, clusterDetailsPage, dbInstancesPage, alarmsPage, logGroupsPage } from "../parse.js";
 import { listObjects, listUsers } from "../aws-args.js";
+import { describeAwsError, describeFieldError } from "../errors.js";
 
 // The fixtures are recorded from moto (see scripts/mock-aws-record.sh): real response shapes, paging keys and flags.
 // Ids and dates change on each recording, so tests compare with the raw fixture or check the shape, not fixed values.
@@ -242,4 +243,35 @@ test("recorded fixtures hold only moto's fake account id and no public IP addres
   const accounts = new Set(text.match(/(?<![0-9])[0-9]{12}(?![0-9])/g));
   assert.ok(accounts.has("123456789012"));
   assert.ok(!text.includes("54.214."), "moto's random public IPs must be replaced by the record script");
+});
+
+test("bucket settings parse from moto fixtures: reports-bucket has all four set", () => {
+  assert.equal(ownershipText(fixture("s3-get-bucket-ownership-controls-reports")), "BucketOwnerEnforced");
+  assert.equal(versioningText(fixture("s3-get-bucket-versioning-reports")), "Enabled");
+  assert.match(encryptionText(fixture("s3-get-bucket-encryption-reports")), /^SSE-KMS \(arn:aws:kms:.*key\/.+\)$/);
+  assert.equal(publicAccessText(fixture("s3-get-public-access-block-reports")), "All on");
+});
+
+test("versioning never enabled: the CLI prints no JSON, so Status is missing", () => {
+  assert.equal(versioningText(JSON.parse(readFileSync(new URL("./fixtures/s3-get-bucket-versioning-logs.json", import.meta.url), "utf8") || "{}")), "Off"); // runAws turns empty output into {}
+  assert.equal(versioningText({ Status: "Suspended" }), "Suspended");
+});
+
+test("encryption: SSE-S3, SSE-KMS without a key, and no rule", () => {
+  const rule = (algorithm, key) => ({ ServerSideEncryptionConfiguration: { Rules: [{ ApplyServerSideEncryptionByDefault: { SSEAlgorithm: algorithm, ...(key ? { KMSMasterKeyID: key } : {}) } }] } });
+  assert.equal(encryptionText(rule("AES256")), "SSE-S3");
+  assert.equal(encryptionText(rule("aws:kms")), "SSE-KMS");
+  assert.equal(encryptionText({}), "—");
+});
+
+test("public access block lists the flags that are off", () => {
+  const config = { BlockPublicAcls: true, IgnorePublicAcls: false, BlockPublicPolicy: true };
+  assert.equal(publicAccessText({ PublicAccessBlockConfiguration: config }), "Off: IgnorePublicAcls, RestrictPublicBuckets");
+});
+
+test("unset bucket settings (logs-bucket) fail with codes that map to Not set", () => {
+  for (const name of ["s3-get-bucket-ownership-controls-logs", "s3-get-bucket-encryption-logs", "s3-get-public-access-block-logs"]) {
+    const stderr = readFileSync(new URL(`./fixtures/${name}.error.txt`, import.meta.url), "utf8");
+    assert.equal(describeFieldError(describeAwsError(stderr, "p")), "Not set", name);
+  }
 });

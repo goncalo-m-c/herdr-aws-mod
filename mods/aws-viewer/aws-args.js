@@ -3,7 +3,7 @@
 
 export const PAGE_SIZE = 50;
 
-const READ_ONLY_COMMANDS = new Set(["s3api list-buckets", "s3api list-objects-v2", "ssm describe-parameters", "iam list-users", "iam list-roles", "iam list-groups", "iam list-policies", "secretsmanager list-secrets", "lambda list-functions", "ecr describe-repositories", "ecr describe-images", "ec2 describe-instances", "efs describe-file-systems", "eks list-clusters", "eks describe-cluster", "rds describe-db-instances", "cloudwatch describe-alarms", "logs describe-log-groups", "configure get"]);
+const READ_ONLY_COMMANDS = new Set(["s3api list-buckets", "s3api list-objects-v2", "s3api get-bucket-ownership-controls", "s3api get-bucket-versioning", "s3api get-bucket-encryption", "s3api get-public-access-block", "ssm describe-parameters", "iam list-users", "iam list-roles", "iam list-groups", "iam list-policies", "secretsmanager list-secrets", "lambda list-functions", "ecr describe-repositories", "ecr describe-images", "ec2 describe-instances", "efs describe-file-systems", "eks list-clusters", "eks describe-cluster", "rds describe-db-instances", "cloudwatch describe-alarms", "logs describe-log-groups", "configure get"]);
 const REGION = /^[a-z]{2}(-[a-z]+)+-\d+$/;
 // The CLI reads file:// (and similar) values from disk; a resource name must never do that.
 const URL_LIKE = /^[a-z][a-z0-9+.-]*:\/\//i;
@@ -18,6 +18,23 @@ export function listBuckets(token) {
 export function listObjects(bucket, prefix, token) {
   return ["s3api", "list-objects-v2", "--no-paginate", flag("--bucket", bucket), ...(prefix ? [flag("--prefix", prefix)] : []),
     "--delimiter=/", `--max-keys=${PAGE_SIZE}`, ...tokenArg("--continuation-token", token)];
+}
+
+/** Bucket settings for the details pane; each is one small read-only call, not paged. */
+export function getBucketOwnershipControls(bucket) {
+  return ["s3api", "get-bucket-ownership-controls", flag("--bucket", bucket)];
+}
+
+export function getBucketVersioning(bucket) {
+  return ["s3api", "get-bucket-versioning", flag("--bucket", bucket)];
+}
+
+export function getBucketEncryption(bucket) {
+  return ["s3api", "get-bucket-encryption", flag("--bucket", bucket)];
+}
+
+export function getPublicAccessBlock(bucket) {
+  return ["s3api", "get-public-access-block", flag("--bucket", bucket)];
 }
 
 /** Metadata only: describe-parameters never returns values. `path` "" lists every parameter. */

@@ -26,6 +26,15 @@ export function describeAwsError(stderr, profile) {
   return rule ? rule[1](profile || "this profile") : firstLine(text) || "The aws command failed with no message.";
 }
 
+const NOT_SET = /NotFoundError|NoSuchPublicAccessBlockConfiguration/;
+
+/** One details field failed: `message` is what describeAwsError made. Shown in that row only. */
+export function describeFieldError(message) {
+  if (NOT_SET.test(message)) return "Not set";
+  if (/^Access denied/.test(message)) return "No access";
+  return message;
+}
+
 /** exec rejected: the program could not start. */
 export function describeExecFailure(error) {
   const text = String(error?.message ?? error ?? "");

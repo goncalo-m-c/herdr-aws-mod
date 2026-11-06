@@ -36,6 +36,13 @@ seed_global() {
   for key in readme.txt reports/2024-05.csv reports/2024-06.csv reports/daily/2024-06-01.csv reports/archive/old.csv; do
     aws s3api put-object --bucket reports-bucket --key "$key" --body /data/data.csv >/dev/null
   done
+  # reports-bucket has every bucket setting; logs-bucket keeps moto's defaults (no ownership, encryption or access block).
+  aws s3api put-bucket-ownership-controls --bucket reports-bucket --ownership-controls 'Rules=[{ObjectOwnership=BucketOwnerEnforced}]' >/dev/null
+  aws s3api put-bucket-versioning --bucket reports-bucket --versioning-configuration Status=Enabled >/dev/null
+  aws s3api put-bucket-encryption --bucket reports-bucket --server-side-encryption-configuration \
+    '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"aws:kms","KMSMasterKeyID":"arn:aws:kms:us-east-1:123456789012:key/1234abcd-12ab-34cd-56ef-1234567890ab"}}]}' >/dev/null
+  aws s3api put-public-access-block --bucket reports-bucket --public-access-block-configuration \
+    BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true >/dev/null
   aws s3api put-object --bucket logs-bucket --key note.txt --body /data/note.txt >/dev/null
 }
 
