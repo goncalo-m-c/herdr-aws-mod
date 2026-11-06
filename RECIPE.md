@@ -8,7 +8,7 @@ A read-only browser for your AWS account, in a Herdr tab. A header shows the pro
 
 The mod is one pane, 900 by 600 at first, in the theme's background and foreground colors. Text is 13px.
 
-`preview.png` shows the final build: the header with the profile, the region and the `read-only` label, the tree with S3 and EC2 expanded (EC2 is grouped per region), and the details pane for one EC2 instance.
+`preview.png` shows the final build: the header with the profile, the region and the `read-only` label, the tree with a `global` folder (S3 expanded, IAM closed) and one folder per region (`eu-west-1` open with EC2 expanded), and the details pane for one S3 bucket.
 
 - **Header, 42px high**, with a bottom border. Left to right:
   - A neutral cloud icon (`cloud.svg`, 20px, muted color).
