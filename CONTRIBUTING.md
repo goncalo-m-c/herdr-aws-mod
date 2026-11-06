@@ -5,8 +5,14 @@
 Use [Conventional Commits](https://www.conventionalcommits.org/) for commit
 messages and PR titles: `feat:`, `fix:`, `docs:`, `test:`, `ci:`, `chore:`.
 
-Only `feat`, `fix` and `deps` produce a release and a changelog entry. The
-other types are fine, but they do not trigger a release by themselves.
+Only commits that change files under `mods/` produce a release, because
+`mods` is the package path in `release-please-config.json`. Changes to docs,
+scripts and CI outside `mods/` never trigger a release, and they do not show
+up in the changelog.
+
+Among the commits that touch `mods/`, only `feat`, `fix`, `perf`, `revert`
+and `docs` produce a release and a changelog entry. The other types are fine,
+but they do not trigger a release by themselves.
 
 ## Merging
 
