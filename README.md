@@ -8,7 +8,7 @@ See [RECIPE.md](RECIPE.md) for the full brief. The mod lives in `mods/aws-viewer
 
 ## Supported services
 
-Services marked global show once. Regional services show one group per region (see the `regions` prop).
+The tree has a `global` folder first (S3, IAM), then one folder per region with the regional services inside. All folders start closed. See the `regions` prop.
 
 | Service | Scope | What you can browse | Read-only command(s) |
 |---|---|---|---|
@@ -44,11 +44,11 @@ Launch props (all optional):
 
 - `profile`: the AWS profile to use.
 - `region`: the AWS region to use.
-- `regions`: a list of AWS regions. Regional services (SSM, Secrets Manager, Lambda, ECR, EC2, EFS, EKS, RDS, CloudWatch) show one group per region. Global services (S3, IAM) show once.
+- `regions`: a list of AWS regions. Each listed region gets its own folder, in the order given, holding the regional services (SSM, Secrets Manager, Lambda, ECR, EC2, EFS, EKS, RDS, CloudWatch). Global services (S3, IAM) live in the `global` folder.
 
 Example: `--props '{"profile": "dev", "region": "eu-west-1"}'`.
 Several regions: `--props '{"profile": "dev", "regions": ["us-east-1", "eu-west-1"]}'`.
-An invalid region name is refused and nothing is shown. Without `regions`, the viewer uses one region as before.
+An invalid region name is refused and nothing is shown. Without `regions`, one folder is shown for the single resolved region. If no region resolves at all, the header says "No region set. Pass `region` or `regions`." and only `global` is shown.
 Without props, the mod reads `AWS_PROFILE`, then `AWS_REGION` or `AWS_DEFAULT_REGION`, from your login shell.
 The tab is renamed to `☁ <profile>`, unless you named it yourself.
 

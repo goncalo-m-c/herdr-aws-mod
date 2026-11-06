@@ -1,6 +1,6 @@
 # Herdr Browser for AWS
 
-A read-only browser for your AWS account, in a Herdr tab. A header shows the profile and region. Below it, a tree lists eleven services: S3, IAM, Secrets Manager, Lambda, ECR, EC2, EFS, EKS, RDS, CloudWatch and SSM Parameter Store. Selecting an item opens its metadata at the right. You can pass one region, or a list of regions so each regional service gets one group per region.
+A read-only browser for your AWS account, in a Herdr tab. A header shows the profile and region. Below it, a tree has a `global` folder (S3, IAM) and one folder per region (Secrets Manager, Lambda, ECR, EC2, EFS, EKS, RDS, CloudWatch and SSM Parameter Store). Selecting an item opens its metadata at the right. You can pass one region, or a list of regions so each gets its own folder.
 
 ![Herdr Browser for AWS](preview.png)
 
@@ -17,10 +17,10 @@ The mod is one pane, 900 by 600 at first, in the theme's background and foregrou
   - A spacer, then `read-only` in 11px dim.
   - A 26px reload button with the refresh icon.
 - **Tree, left.** Rows are 26px high. Each level indents 16px. The tree scrolls and has 6px padding.
-  - Eleven roots, in this order: `S3`, `IAM`, `Secrets Manager`, `Lambda`, `ECR`, `EC2`, `EFS`, `EKS`, `RDS`, `CloudWatch`, `SSM Parameter Store`. Roots use the accent-colored cloud icon.
+  - Roots, in this order: `global`, then one folder per region. `global` holds `S3` and `IAM`. Each region folder holds `Secrets Manager`, `Lambda`, `ECR`, `EC2`, `EFS`, `EKS`, `RDS`, `CloudWatch`, `SSM Parameter Store`. Folders use the accent-colored cloud icon and start closed.
   - Folders show a chevron (right or down). Leaves show no chevron. Icons: bucket for buckets, folder for folders, file for most leaves, key for secrets and SSM parameters.
   - Folders are sorted before leaves, then by name.
-  - A spinner shows while a folder loads. A refresh button shows on loaded folders that make an `aws` call. Group rows (region groups, IAM, CloudWatch and its region groups) have no refresh button.
+  - A spinner shows while a folder loads. A refresh button shows on loaded folders that make an `aws` call. Group rows (`global`, region folders, IAM, CloudWatch) have no refresh button.
   - Hint rows: `Loading…`, the error text in red, and an empty text: `No buckets`, `Empty bucket`, `Empty folder`, `No parameters`, `No users`, `No roles`, `No groups`, `No local policies`, `No secrets`, `No functions`, `No repositories`, `No images`, `No instances`, `No file systems`, `No clusters`, `No DB instances`, `No details`. Other empty folders (CloudWatch Alarms and Log groups) show `Empty`.
   - A `Load more…` row in the accent color appears while a next page exists.
 - **Details pane, right,** 320px wide with a left border. It appears only when a leaf is selected. It shows the leaf's name in bold, then label and value rows (label column 96px, dim), then a dim 11px note about what is never read.
@@ -48,10 +48,11 @@ The mod is one pane, 900 by 600 at first, in the theme's background and foregrou
 - **Global and regional services.**
   - S3 and IAM are global. They are shown once, whatever `regions` says.
   - SSM Parameter Store, Secrets Manager, Lambda, ECR, EC2, EFS, EKS, RDS and CloudWatch are regional.
-  - Without `regions`, a regional service lists its resources directly, using the single region (or the profile default).
-  - With `regions`, each regional service becomes a folder that holds one group per region, labelled with the region name, in the order given. Duplicates are dropped. Every `aws` call under a group gets that group's `--region`, so the group's region wins over the `region` prop. The same resource name in two regions is two separate rows.
-  - A region group makes no call. Opening it shows the service's list, loaded on first open.
-- **Fixed folders.** IAM opens to four folders with no call: `Users`, `Roles`, `Groups`, `Policies (local)` (customer-managed policies only). CloudWatch opens to two folders, `Alarms` (metric alarms) and `Log groups`. With `regions`, each CloudWatch region group holds those two folders. IAM does not change with `regions`.
+  - The `global` folder holds the global services. Their calls use the base target region.
+  - Each region folder holds the regional services, in the order above. Without `regions`, one folder is shown for the single resolved region (prop, env, or the profile default). If no region resolves at all, the header says "No region set. Pass `region` or `regions`." and only the `global` folder is shown.
+  - With `regions`, the folders follow the order given. Duplicates are dropped. Every `aws` call under a region folder gets that `--region`, so it wins over the `region` prop. The same resource name in two regions is two separate rows.
+  - Top-level folders make no call. Opening a service under one loads its list on first open.
+- **Fixed folders.** IAM opens to four folders with no call: `Users`, `Roles`, `Groups`, `Policies (local)` (customer-managed policies only). CloudWatch opens to two folders, `Alarms` (metric alarms) and `Log groups`. Both exist once per region folder (CloudWatch) or once in `global` (IAM).
 - **Nested folders.**
   - S3: a bucket opens to its objects. Prefixes are folders and objects are leaves.
   - SSM: parameter names split on `/`. Each next segment is a folder. SSM has no folder API, so a "Load more" may add only new folders.
@@ -84,13 +85,13 @@ The mod makes no network call of its own. Network access happens only inside the
 **Module files** in `mods/aws-viewer/`:
 
 - `main.js`: the view (class `AwsViewer`), header, layout, sessions and page loading. A session is one profile, one region list and one tree. Starting a new one makes results from the old one stale.
-- `aws-args.js`: builds every `aws` argv, holds the read-only allowlist, and checks values (see below). Exports `invocation`, `isReadOnly`, `regionList`, `configuredRegion`, `Refusal`, `PAGE_SIZE` (50) and one builder per command.
-- `aws.js`: **the only file that runs `aws`**. `runAws` returns parsed JSON. `profileRegion` runs `aws configure get region`.
+- `aws-args.js`: builds every `aws` argv, holds the read-only allowlist, and checks values (see below). Exports `invocation`, `isReadOnly`, `regionList`, `pickRegions`, `needsRegionLookup`, `regionsOutcome`, `NO_REGION_MESSAGE`, `configuredRegion`, `Refusal`, `PAGE_SIZE` (50) and one builder per command.
+- `aws.js`: **the only file that runs `aws`**. `runAws` returns parsed JSON. `profileRegion` runs `aws configure get region`: it returns "" when no region is set and throws when the lookup fails.
 - `env.js`: the login-shell read.
 - `context.js`: `needsShellEnv`, `parseShellEnv`, `resolveTarget` (props first, then shell values).
 - `resources.js`: the `SERVICES` list, the map from node kind to its `aws` command and parser, `isFolder`, `isGroupNode`, `pageCommand`, `parsePage`.
 - `parse.js`: turns CLI JSON into tree items, one parser per service. Items carry metadata only.
-- `tree.js`: lazy tree state: `createTree(services, regions)`, `toggle`, `startLoad`, `finishLoad`, `failLoad`, `refresh`, `select`, `visibleRows`. Holds the paging tickets and the overlap guard.
+- `tree.js`: lazy tree state: `createTree(services, regions)`, `emptyTree`, `toggle`, `startLoad`, `finishLoad`, `failLoad`, `refresh`, `select`, `visibleRows`. Holds the paging tickets and the overlap guard.
 - `rows.js`: draws tree rows, hint rows and the `Load more…` row.
 - `details.js` and `format.js`: the details pane and its text formatting.
 - `errors.js`: short messages for failed `aws` calls and for a missing `aws` program.
@@ -144,9 +145,9 @@ Response fields read, per command: `Buckets[].Name/CreationDate/BucketRegion` an
 ## Done when
 
 - `herdr-app check mods/aws-viewer` passes.
-- Opening with `--props '{"profile":"dev"}'` and a working login lists the eleven roots in the order above, and the header reads `profile dev`.
+- Opening with `--props '{"profile":"dev"}'` and a working login lists `global` and one folder for the profile's region, and the header reads `profile dev`.
 - Opening `S3` loads up to 50 buckets. Opening `IAM` shows `Users`, `Roles`, `Groups` and `Policies (local)` with no `aws` call.
-- With `--props '{"profile":"dev","regions":["us-east-1","eu-west-1"]}'`, S3 and IAM appear once, and Lambda shows `us-east-1` and `eu-west-1`. Opening a group runs `aws lambda list-functions` with that group's `--region`.
+- With `--props '{"profile":"dev","regions":["us-east-1","eu-west-1"]}'`, the roots are `global`, `us-east-1` and `eu-west-1`. Opening Lambda under `eu-west-1` runs `aws lambda list-functions` with `--region=eu-west-1`.
 - With `--props '{"regions":["nope"]}'`, the header shows the red `Refused` line, the tree is empty and no `aws` command runs.
 - Selecting a leaf shows the details pane and runs no command.
 - The tab is renamed to `☁ <profile>`.

@@ -4,7 +4,7 @@ A read-only AWS resource viewer laid out like a file browser. It covers S3, IAM,
 
 ## What it does
 
-- The root lists eleven services: **S3**, **IAM**, **Secrets Manager**, **Lambda**, **ECR**, **EC2**, **EFS**, **EKS**, **RDS**, **CloudWatch** and **SSM Parameter Store**. Nothing loads until you open a node.
+- The root lists a **global** folder, then one folder per region. **global** holds **S3** and **IAM**. Each region folder holds **Secrets Manager**, **Lambda**, **ECR**, **EC2**, **EFS**, **EKS**, **RDS**, **CloudWatch** and **SSM Parameter Store**. All folders start closed. Nothing loads until you open a node.
 - **S3**: opening it lists buckets. Opening a bucket or prefix lists one level: prefixes are folders, objects are leaves.
 - **IAM** (global, shown once): opening it shows four folders: Users, Roles, Groups and Policies (local). Each folder lists that kind of resource. Only customer-managed policies are listed.
 - **Secrets Manager** (regional): opening it lists secret names. A secret shows its ARN, description and dates. The secret value is never read.
@@ -14,7 +14,7 @@ A read-only AWS resource viewer laid out like a file browser. It covers S3, IAM,
 - **EFS** (regional): opening it lists file systems. A file system shows its ID, name, size, performance mode and state.
 - **EKS** (regional): opening it lists clusters as folders. A cluster opens to one details row with its version, status, endpoint and created date.
 - **RDS** (regional): opening it lists DB instances. An instance shows its identifier, engine, version, class, status and endpoint. Master usernames and passwords are never read.
-- **CloudWatch** (regional): each region group has two folders, **Alarms** (metric alarms) and **Log groups**. An alarm shows its name, state, metric, namespace, threshold and last state update. A log group shows its name, stored bytes, retention days and created date. Metric data and log events are never read.
+- **CloudWatch** (regional): it has two folders, **Alarms** (metric alarms) and **Log groups**. An alarm shows its name, state, metric, namespace, threshold and last state update. A log group shows its name, stored bytes, retention days and created date. Metric data and log events are never read.
 - **SSM**: opening it lists the parameter hierarchy. `/app/env/...` segments are folders, parameters are leaves.
 - Each folder loads 50 items per page. A **Load more…** row appears while a next token exists.
 - Selecting a leaf opens a read-only details pane with metadata:
@@ -33,7 +33,7 @@ A read-only AWS resource viewer laid out like a file browser. It covers S3, IAM,
 - The profile comes from `AWS_PROFILE`, read from your login shell (`$SHELL -lc`). Herdr's own environment may lack it.
 - The region comes from `AWS_REGION`, else `AWS_DEFAULT_REGION`. If neither is set, the profile's config region applies.
 - Props override both: `{"profile": "dev", "region": "eu-west-1"}`.
-- The `regions` prop lists several regions: `{"profile": "dev", "regions": ["us-east-1", "eu-west-1"]}`. Regional services (SSM, Secrets Manager, Lambda, ECR, EC2, EFS, EKS, RDS, CloudWatch) show one group per region, and every call under a group gets that group's `--region`. Global services (S3, IAM) show once. A name that does not look like `xx-name-N` is refused. Without `regions`, one region is used as before.
+- The `regions` prop lists several regions: `{"profile": "dev", "regions": ["us-east-1", "eu-west-1"]}`. Each listed region gets its own folder, and every call under it gets that folder's `--region`. Global services (S3, IAM) live in the `global` folder and use the base region. A name that does not look like `xx-name-N` is refused. Without `regions`, one folder is shown for the single resolved region. If no region resolves at all, the header says "No region set. Pass `region` or `regions`." and only `global` is shown.
 
 ## The aws commands it runs
 
