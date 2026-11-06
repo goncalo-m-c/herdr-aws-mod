@@ -43,6 +43,8 @@ export default class AwsViewer extends View {
       const shell = needsShellEnv(given) ? await loginShellEnv() : {};
       if (this.session !== session) return;
       this.target = resolveTarget(given, shell);
+      this.nameTab(); // needs only the profile: never wait for the region lookup
+      cx.notify();
       let region = this.target.region, lookupError = "";
       if (needsRegionLookup(given.regions, region)) {
         try { region = await profileRegion(this.target); } catch (e) { lookupError = e.message; }
@@ -50,7 +52,6 @@ export default class AwsViewer extends View {
       }
       this.shownRegion = region;
       this.useRegions(given.regions, region, lookupError);
-      this.nameTab();
       cx.notify();
     });
   }
