@@ -10,6 +10,34 @@ export function bucketsPage(json) {
   return { items, nextToken: json?.ContinuationToken ?? null };
 }
 
+/** s3api get-bucket-ownership-controls */
+export function ownershipText(json) {
+  return json?.OwnershipControls?.Rules?.[0]?.ObjectOwnership ?? "—";
+}
+
+/** s3api get-bucket-versioning: no Status means versioning was never turned on. */
+export function versioningText(json) {
+  return json?.Status ?? "Off";
+}
+
+/** s3api get-bucket-encryption: the default rule's algorithm, plus the key for KMS. */
+export function encryptionText(json) {
+  const rule = json?.ServerSideEncryptionConfiguration?.Rules?.[0]?.ApplyServerSideEncryptionByDefault;
+  if (!rule) return "—";
+  if (rule.SSEAlgorithm === "AES256") return "SSE-S3";
+  if (rule.SSEAlgorithm === "aws:kms") return rule.KMSMasterKeyID ? `SSE-KMS (${rule.KMSMasterKeyID})` : "SSE-KMS";
+  return rule.SSEAlgorithm ?? "—";
+}
+
+const PUBLIC_ACCESS_FLAGS = ["BlockPublicAcls", "IgnorePublicAcls", "BlockPublicPolicy", "RestrictPublicBuckets"];
+
+/** s3api get-public-access-block: `All on`, or the flags that are off. */
+export function publicAccessText(json) {
+  const config = json?.PublicAccessBlockConfiguration ?? {};
+  const off = PUBLIC_ACCESS_FLAGS.filter((flag) => config[flag] !== true);
+  return off.length ? `Off: ${off.join(", ")}` : "All on";
+}
+
 /** s3api list-objects-v2 with --delimiter "/": prefixes are folders, objects are leaves. */
 export function objectsPage(json, bucket, prefix) {
   const folders = (json?.CommonPrefixes ?? []).map((p) => ({

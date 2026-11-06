@@ -18,6 +18,7 @@ A read-only AWS resource viewer laid out like a file browser. It covers S3, IAM,
 - **SSM**: opening it lists the parameter hierarchy. `/app/env/...` segments are folders, parameters are leaves.
 - Each folder loads 50 items per page. A **Load more…** row appears while a next token exists.
 - Selecting a leaf opens a read-only details pane with metadata:
+  - S3 bucket (click it): name, region, created, object ownership, versioning, encryption, block public access. The last four load on their own and show `Loading…`, `Not set`, `No access` or a short error per field.
   - S3 object: bucket, key, size, last modified, storage class, ETag.
   - IAM user, role, group or policy: name, ARN, ID, path, created date and a few type-specific fields.
   - Secret: name, ARN, description, last changed, last accessed, created.
@@ -43,6 +44,7 @@ Every call gets `--profile=<p> [--region=<r>] --output=json --no-cli-pager --no-
 |---|---|
 | S3 | `aws s3api list-buckets --no-paginate --max-buckets=50 [--continuation-token=T]` |
 | Bucket / prefix | `aws s3api list-objects-v2 --no-paginate --bucket=B [--prefix=P] --delimiter=/ --max-keys=50 [--continuation-token=T]` |
+| Bucket details (when a bucket is selected, in the bucket's region) | `aws s3api get-bucket-ownership-controls --bucket=B`, `get-bucket-versioning`, `get-bucket-encryption`, `get-public-access-block` (same `--bucket=B`) |
 | IAM users | `aws iam list-users --max-items=50 [--starting-token=T]` |
 | IAM roles | `aws iam list-roles --max-items=50 [--starting-token=T]` |
 | IAM groups | `aws iam list-groups --max-items=50 [--starting-token=T]` |
@@ -64,13 +66,13 @@ Every call gets `--profile=<p> [--region=<r>] --output=json --no-cli-pager --no-
 
 IAM, Lambda, ECR, EC2, EFS, EKS, RDS and CloudWatch (alarms and log groups) use the CLI's paging, since they have no native page-size flag, and the CLI rejects `--no-paginate` together with `--max-items`, so their calls use the CLI's `--max-items` and `--starting-token`. For the other services, `--no-paginate` with the native page size and token makes exactly one API call per page. The CLI's `--max-items` counts only `Contents`. On a prefix-only bucket level, `--max-items` would therefore walk every page.
 
-Selecting a leaf makes no call. The details come from the listing.
+Selecting a leaf makes no call. The details come from the listing. Selecting a bucket also opens it, and runs the four bucket detail calls once (cached, reloaded on refresh).
 
 ## Safety
 
 All `aws` calls go through `aws.js` → `invocation()` in `aws-args.js`. That function checks these rules before any argv exists:
 
-1. **Read-only allowlist.** Only `s3api list-buckets`, `s3api list-objects-v2`, `ssm describe-parameters`, `iam list-users`, `iam list-roles`, `iam list-groups`, `iam list-policies`, `secretsmanager list-secrets`, `lambda list-functions`, `ecr describe-repositories`, `ecr describe-images`, `ec2 describe-instances`, `efs describe-file-systems`, `eks list-clusters`, `eks describe-cluster`, `rds describe-db-instances`, `cloudwatch describe-alarms`, `logs describe-log-groups` and `configure get` pass. The viewer refuses any argument that contains `decryption`.
+1. **Read-only allowlist.** Only `s3api list-buckets`, `s3api list-objects-v2`, `s3api get-bucket-ownership-controls`, `s3api get-bucket-versioning`, `s3api get-bucket-encryption`, `s3api get-public-access-block`, `ssm describe-parameters`, `iam list-users`, `iam list-roles`, `iam list-groups`, `iam list-policies`, `secretsmanager list-secrets`, `lambda list-functions`, `ecr describe-repositories`, `ecr describe-images`, `ec2 describe-instances`, `efs describe-file-systems`, `eks list-clusters`, `eks describe-cluster`, `rds describe-db-instances`, `cloudwatch describe-alarms`, `logs describe-log-groups` and `configure get` pass. The viewer refuses any argument that contains `decryption`.
 2. **Value safety.** Values use the `--flag=value` form, so a name that starts with `-` is never read as a flag. The viewer refuses resource names that look like `file://` or other URLs. The CLI would read those from disk.
 3. **Region format.** The region must look like `xx-name-N`.
 

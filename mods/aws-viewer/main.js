@@ -8,8 +8,10 @@ import { needsShellEnv, resolveTarget } from "./context.js";
 import { loginShellEnv } from "./env.js";
 import { needsRegionLookup, regionsOutcome } from "./aws-args.js";
 import { runAws, profileRegion } from "./aws.js";
-import { SERVICES, isFolder, pageCommand, parsePage } from "./resources.js";
-import { createTree, emptyTree, toggle, startLoad, finishLoad, failLoad, refresh, select, visibleRows } from "./tree.js";
+import { SERVICES, pageCommand, parsePage } from "./resources.js";
+import { DETAIL_CALLS, detailTarget, detailsToStart, startDetails, settleDetail } from "./bucket-details.js";
+import { describeFieldError } from "./errors.js";
+import { createTree, emptyTree, activate as activateNode, startLoad, finishLoad, failLoad, refresh, visibleRows } from "./tree.js";
 import { treeRow } from "./rows.js";
 import { detailsPane } from "./details.js";
 
@@ -73,15 +75,34 @@ export default class AwsViewer extends View {
   }
 
   activate(id, cx) {
-    const node = this.tree.nodes.get(id);
-    if (isFolder(node)) { if (toggle(this.tree, id)) this.load(id, false, cx); }
-    else select(this.tree, id);
+    if (activateNode(this.tree, id)) this.load(id, false, cx);
+    this.loadDetails(id, cx);
     cx.notify();
   }
 
   refreshNode(id, cx) {
-    if (refresh(this.tree, id)) this.load(id, false, cx);
+    if (refresh(this.tree, id)) { this.load(id, false, cx); this.loadDetails(id, cx); }
     cx.notify();
+  }
+
+  // The extra calls behind a bucket's details: lazy, once per bucket, each field settles on its own.
+  loadDetails(id, cx) {
+    const node = detailsToStart(this.tree, id);
+    if (!node) return;
+    const details = startDetails(node), session = this.session;
+    for (const call of DETAIL_CALLS) {
+      cx.spawn(async (cx) => {
+        const text = await this.runDetail(node, call);
+        if (this.session === session && settleDetail(node, details, call.key, text)) cx.notify();
+      });
+    }
+  }
+
+  async runDetail(node, call) {
+    try {
+      if (!this.target) throw new Error("Still reading AWS_PROFILE. Refresh in a moment.");
+      return call.parse(await runAws(call.command(node.bucket), detailTarget(node, this.target)));
+    } catch (e) { return describeFieldError(String(e?.message ?? e), e?.stderr); }
   }
 
   // One page into a folder. startLoad returns null while a load runs: the overlap guard.

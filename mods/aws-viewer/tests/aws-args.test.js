@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, describeFileSystems, listClusters, describeCluster, describeDbInstances, describeAlarms, describeLogGroups, regionList, pickRegions, needsRegionLookup, regionsOutcome, NO_REGION_MESSAGE, Refusal, PAGE_SIZE } from "../aws-args.js";
+import { invocation, listBuckets, listObjects, describeParameters, configuredRegion, isReadOnly, listUsers, listRoles, listGroups, listLocalPolicies, listSecrets, listFunctions, describeRepositories, describeImages, describeInstances, describeFileSystems, listClusters, describeCluster, describeDbInstances, describeAlarms, describeLogGroups, getBucketOwnershipControls, getBucketVersioning, getBucketEncryption, getPublicAccessBlock, regionList, pickRegions, needsRegionLookup, regionsOutcome, NO_REGION_MESSAGE, Refusal, PAGE_SIZE } from "../aws-args.js";
 
 const DEV = { profile: "dev", region: "eu-west-1" };
 
@@ -231,4 +231,20 @@ test("needsRegionLookup only when no region and no usable regions prop", () => {
   assert.equal(needsRegionLookup(["eu-west-1"], ""), false);
   assert.equal(needsRegionLookup(undefined, "us-east-1"), false);
   assert.equal(needsRegionLookup("bad", ""), false);
+});
+
+test("bucket detail calls are allowed and use the bucket flag", () => {
+  const builders = { "get-bucket-ownership-controls": getBucketOwnershipControls, "get-bucket-versioning": getBucketVersioning, "get-bucket-encryption": getBucketEncryption, "get-public-access-block": getPublicAccessBlock };
+  for (const [name, build] of Object.entries(builders)) {
+    assert.ok(isReadOnly(build("b")), name);
+    assert.deepEqual(build("b"), ["s3api", name, "--bucket=b"]);
+  }
+  assert.ok(invocation(getBucketVersioning("b"), { profile: "dev", region: "eu-west-1" }).includes("--region=eu-west-1"));
+  assert.throws(() => getBucketEncryption("file:///x"), Refusal);
+});
+
+test("write bucket calls are still refused", () => {
+  for (const name of ["put-bucket-versioning", "put-bucket-encryption", "put-public-access-block", "delete-public-access-block", "put-bucket-ownership-controls", "get-bucket-policy"]) {
+    assert.equal(isReadOnly(["s3api", name, "--bucket=b"]), false, name);
+  }
 });

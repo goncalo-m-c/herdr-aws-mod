@@ -58,8 +58,9 @@ The mod is one pane, 900 by 600 at first, in the theme's background and foregrou
   - SSM: parameter names split on `/`. Each next segment is a folder. SSM has no folder API, so a "Load more" may add only new folders.
   - ECR: each repository is a folder of images.
   - EKS: each cluster is a folder that opens to one details leaf (labelled like `v1.30 ACTIVE`).
-- **Click a folder row.** It opens or closes. The first open loads one page of 50 items. Reopening a folder that failed retries it.
+- **Click a folder row.** It opens or closes, and selects it when its kind has details (a bucket). The first open loads one page of 50 items. Reopening a folder that failed retries it.
 - **Click a leaf.** It selects the leaf and shows details. This makes no AWS call.
+- **Click a bucket.** It opens and is selected. The pane shows Name, Region and Created at once. Object Ownership, Versioning, Encryption and Block Public Access show `Loading…` until their own call returns. Each of the four calls runs once per bucket, is cached on the node, and runs again on the bucket's refresh button. An unset setting shows `Not set`, AccessDenied shows `No access`, any other error shows short text in that row only. Versioning shows `Enabled`, `Suspended` or `Off`; Encryption `SSE-S3` or `SSE-KMS (key)`; Block Public Access `All on` or `Off: <flags>`.
 - **Load more.** It loads the next page of 50 with the token.
 - **Overlap guard.** While a folder loads, a second load for it is ignored.
 - **Refresh button on a folder.** It drops that folder's rows and reloads it. Results from the older load are discarded.
@@ -94,12 +95,13 @@ The mod makes no network call of its own. Network access happens only inside the
 - `tree.js`: lazy tree state: `createTree(services, regions)`, `emptyTree`, `toggle`, `startLoad`, `finishLoad`, `failLoad`, `refresh`, `select`, `visibleRows`. Holds the paging tickets and the overlap guard.
 - `rows.js`: draws tree rows, hint rows and the `Load more…` row.
 - `details.js` and `format.js`: the details pane and its text formatting.
+- `bucket-details.js`: the four lazy bucket calls (`DETAIL_CALLS`) and the per-bucket state on `node.details`.
 - `errors.js`: short messages for failed `aws` calls and for a missing `aws` program.
 - `tab-name.js`: renames the viewer's tab with `run("tab.rename", { id, name })`. The name comes from `autoTabName` in `format.js`, which puts the glyph constant `TAB_GLYPH` (U+2601, then one space) before the profile.
-- `tests/`: `aws-args.test.js`, `parse.test.js`, `tree.test.js`, `misc.test.js`, and fake JSON in `tests/fixtures/`.
+- `tests/`: `aws-args.test.js`, `parse.test.js`, `tree.test.js`, `bucket-details.test.js`, `misc.test.js`, and fake JSON in `tests/fixtures/`.
 - Art, 24px stroke icons tinted with `text_color`: `cloud.svg`, `bucket.svg`, `folder.svg`, `file.svg`, `key.svg`, `chevron-right.svg`, `chevron-down.svg`, `refresh.svg`, `spinner.svg`.
 
-**Read-only allowlist.** `invocation()` checks the first two words of the command before building an argv. Only these pass: `s3api list-buckets`, `s3api list-objects-v2`, `ssm describe-parameters`, `iam list-users`, `iam list-roles`, `iam list-groups`, `iam list-policies`, `secretsmanager list-secrets`, `lambda list-functions`, `ecr describe-repositories`, `ecr describe-images`, `ec2 describe-instances`, `efs describe-file-systems`, `eks list-clusters`, `eks describe-cluster`, `rds describe-db-instances`, `cloudwatch describe-alarms`, `logs describe-log-groups`, `configure get`. Anything else throws `Refused: "<two words>" is not a read-only call this viewer allows.` Any argument that contains `decryption` (any case) is refused the same way.
+**Read-only allowlist.** `invocation()` checks the first two words of the command before building an argv. Only these pass: `s3api list-buckets`, `s3api list-objects-v2`, `s3api get-bucket-ownership-controls`, `s3api get-bucket-versioning`, `s3api get-bucket-encryption`, `s3api get-public-access-block`, `ssm describe-parameters`, `iam list-users`, `iam list-roles`, `iam list-groups`, `iam list-policies`, `secretsmanager list-secrets`, `lambda list-functions`, `ecr describe-repositories`, `ecr describe-images`, `ec2 describe-instances`, `efs describe-file-systems`, `eks list-clusters`, `eks describe-cluster`, `rds describe-db-instances`, `cloudwatch describe-alarms`, `logs describe-log-groups`, `configure get`. Anything else throws `Refused: "<two words>" is not a read-only call this viewer allows.` Any argument that contains `decryption` (any case) is refused the same way.
 
 **Value checks.** Values use the `--flag=value` form, so a name that starts with `-` is never read as a flag. A resource name or token that looks like a URL (`^[a-z][a-z0-9+.-]*://`, any case) is refused, because the CLI would read `file://` from disk. A region must match `^[a-z]{2}(-[a-z]+)+-\d+$`.
 
@@ -109,6 +111,7 @@ The mod makes no network call of its own. Network access happens only inside the
 
 - `s3api list-buckets --no-paginate --max-buckets=50 [--continuation-token=T]`
 - `s3api list-objects-v2 --no-paginate --bucket=B [--prefix=P] --delimiter=/ --max-keys=50 [--continuation-token=T]`
+- Bucket details, each `--bucket=B` in the bucket's own region (from list-buckets), not paged: `s3api get-bucket-ownership-controls`, `s3api get-bucket-versioning`, `s3api get-bucket-encryption`, `s3api get-public-access-block`.
 - `ssm describe-parameters --no-paginate [--parameter-filters=[{"Key":"Path","Option":"Recursive","Values":["/app"]}]] --max-results=50 [--next-token=T]`. The filter is left out at the root.
 - `secretsmanager list-secrets --no-paginate --max-results=50 [--next-token=T]`
 - These use the CLI's own paging, `--max-items=50 [--starting-token=T]`, with no `--no-paginate`, because the CLI rejects both together and they have no native page-size flag:
@@ -150,5 +153,6 @@ Response fields read, per command: `Buckets[].Name/CreationDate/BucketRegion` an
 - With `--props '{"profile":"dev","regions":["us-east-1","eu-west-1"]}'`, the roots are `global`, `us-east-1` and `eu-west-1`. Opening Lambda under `eu-west-1` runs `aws lambda list-functions` with `--region=eu-west-1`.
 - With `--props '{"regions":["nope"]}'`, the header shows the red `Refused` line, the tree is empty and no `aws` command runs.
 - Selecting a leaf shows the details pane and runs no command.
+- Clicking a bucket opens it, selects it and shows all 7 fields; the four `s3api get-*` calls run once, in the bucket's region.
 - The tab is renamed to `☁ <profile>`.
 - `docker run --rm --network none -v "$PWD/mods/aws-viewer:/w:ro" -w /w node:22-slim node --test "tests/*.test.js"` passes.

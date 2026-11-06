@@ -1,4 +1,5 @@
-// How the details pane shows a leaf's metadata. Pure, so node --test covers it.
+// How the details pane shows a node's metadata. Pure, so node --test covers it.
+import { detailText } from "./bucket-details.js";
 
 /** Plain-text cloud (U+2601) before the profile in the tab name. No emoji variation selector. */
 export const TAB_GLYPH = "\u2601 ";
@@ -8,9 +9,14 @@ export function autoTabName(profile) {
   return `${TAB_GLYPH}${profile}`;
 }
 
-/** [[label, value]] for an S3 object, SSM parameter, IAM resource, secret, Lambda function, ECR image, EC2 instance, EFS file system, EKS cluster, RDS instance, CloudWatch alarm or log group; never a value or object content. */
+/** [[label, value]] for an S3 bucket, S3 object, SSM parameter, IAM resource, secret, Lambda function, ECR image, EC2 instance, EFS file system, EKS cluster, RDS instance, CloudWatch alarm or log group; never a value or object content. */
 export function detailFields(node) {
   const m = node?.meta ?? {};
+  if (node?.kind === "bucket") return [
+    ["Name", node.bucket], ["Region", m.region ?? "—"], ["Created", formatDate(m.created)],
+    ["Object Ownership", detailText(node, "ownership")], ["Versioning", detailText(node, "versioning")],
+    ["Encryption", detailText(node, "encryption")], ["Block Public Access", detailText(node, "publicAccess")],
+  ];
   if (node?.kind === "object") return [
     ["Bucket", node.bucket], ["Key", node.key], ["Size", sizeWithBytes(m.size)], ["Last modified", formatDate(m.lastModified)],
     ["Storage class", m.storageClass ?? "STANDARD"], ["ETag", String(m.etag ?? "—").replaceAll('"', "")],
